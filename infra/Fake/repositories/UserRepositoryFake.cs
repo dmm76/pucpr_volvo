@@ -3,17 +3,18 @@ using TechStore.Core.Entities;
 
 namespace TechStore.Infra.Fake.Repositories;
 
-public class AdminRepositoryFake
+public class UserRepositoryFake
 {
-    // admin seedado ao subir a API
-    private readonly Admin _admin = new()
+    // usuario admin seedado ao subir a API
+    private readonly User _admin = new()
     {
         Login = "admin",
         Email = "admin@techstore.com",
         SenhaHash = HashService.GerarHash("Admin@123"),
+        Role = UserRole.Admin,
     };
 
-    public Admin? BuscarPorLogin(string login)
+    public User? BuscarPorLogin(string login)
     {
         if (string.IsNullOrWhiteSpace(login))
             return null;

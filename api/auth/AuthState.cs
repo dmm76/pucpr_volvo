@@ -1,22 +1,27 @@
+using TechStore.Core.Entities;
+
 namespace TechStore.Api.Auth;
 
 public class AuthState
 {
-    public bool AdminLogado { get; private set; }
-    public string? AdminLogin { get; private set; }
-    public string? AdminEmail { get; private set; }
+    public bool UserLogado { get; private set; }
+    public string? UserLogin { get; private set; }
+    public string? UserEmail { get; private set; }
+    public UserRole? UserRole { get; private set; }
 
-    public void Logar(string login, string email)
+    public void Logar(string login, string email, UserRole role)
     {
-        AdminLogado = true;
-        AdminLogin = login;
-        AdminEmail = email;
+        UserLogado = true;
+        UserLogin = login;
+        UserEmail = email;
+        UserRole = role;
     }
 
     public void Logout()
     {
-        AdminLogado = false;
-        AdminLogin = null;
-        AdminEmail = null;
+        UserLogado = false;
+        UserLogin = null;
+        UserEmail = null;
+        UserRole = null;
     }
 }

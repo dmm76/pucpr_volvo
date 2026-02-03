@@ -8,7 +8,7 @@ var builder = WebApplication.CreateBuilder(args);
 
 //Controller Auth
 builder.Services.AddSingleton<AuthState>();
-builder.Services.AddSingleton<AdminRepositoryFake>();
+builder.Services.AddSingleton<UserRepositoryFake>();
 
 // Controllers + Swagger
 builder.Services.AddControllers();
