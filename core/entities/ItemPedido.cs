@@ -17,16 +17,15 @@ public class ItemPedido
 
     protected ItemPedido() { }
 
-    public ItemPedido(int pedidoId, Produto produto, int quantidade)
+    public ItemPedido(Produto produto, int quantidade)
     {
-        if (pedidoId <= 0)
-            throw new BusinessRuleException(ErrorCodes.OrderNotFound);
         if (produto is null)
             throw new BusinessRuleException(ErrorCodes.OrderItemProductRequired);
 
-        PedidoId = pedidoId;
-        ProdutoId = produto.Id;
+        if (produto.PrecoAtual <= 0)
+            throw new BusinessRuleException(ErrorCodes.ProductPriceInvalid);
 
+        ProdutoId = produto.Id;
         NomeProdutoSnapshot = produto.Nome;
         PrecoUnitarioSnapshot = produto.PrecoAtual;
 
