@@ -30,9 +30,15 @@ public class User
         if (string.IsNullOrWhiteSpace(login))
             throw new BusinessRuleException(ErrorCodes.UserLoginRequired);
 
-        var novo = login.Trim();
+        var novo = login.Trim().ToLowerInvariant();
+
+        // se você quiser usar o code de tamanho, aplique aqui:
+        if (novo.Length < 3 || novo.Length > 30)
+            throw new BusinessRuleException(ErrorCodes.UserLoginInvalidLength);
+
         if (Login == novo)
             return;
+
         Login = novo;
         MarcarAtualizacao();
     }
@@ -40,14 +46,16 @@ public class User
     public void AtualizarEmail(string email)
     {
         if (string.IsNullOrWhiteSpace(email))
-            throw new ArgumentException("Email is required.");
+            throw new BusinessRuleException(ErrorCodes.UserEmailRequired);
 
-        var novo = email.Trim();
-        if (novo.Length < 5 || !novo.Contains("@"))
-            throw new ArgumentException("Email is invalid.");
+        var novo = email.Trim().ToLowerInvariant();
+
+        if (novo.Length < 5 || !novo.Contains('@'))
+            throw new BusinessRuleException(ErrorCodes.UserEmailInvalid);
 
         if (Email == novo)
             return;
+
         Email = novo;
         MarcarAtualizacao();
     }
@@ -55,11 +63,13 @@ public class User
     public void AlterarSenhaHash(string senhaHash)
     {
         if (string.IsNullOrWhiteSpace(senhaHash))
-            throw new ArgumentException("Senha hash is required.");
+            throw new BusinessRuleException(ErrorCodes.UserPasswordHashRequired);
 
-        var novo = senhaHash.Trim();
+        var novo = senhaHash;
+
         if (SenhaHash == novo)
             return;
+
         SenhaHash = novo;
         MarcarAtualizacao();
     }
@@ -68,6 +78,7 @@ public class User
     {
         if (Role == role)
             return;
+
         Role = role;
         MarcarAtualizacao();
     }

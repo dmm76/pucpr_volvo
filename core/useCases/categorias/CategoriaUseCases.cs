@@ -3,13 +3,13 @@ using TechStore.Core.Entities;
 using TechStore.Core.Exceptions;
 using TechStore.Core.Interfaces;
 
-namespace TechStore.Core.Services;
+namespace TechStore.Core.useCases.categorias;
 
-public class CategoriaService
+public class CategoriaUseCases
 {
     private readonly ICategoriaRepository _repo;
 
-    public CategoriaService(ICategoriaRepository repo)
+    public CategoriaUseCases(ICategoriaRepository repo)
     {
         _repo = repo;
     }

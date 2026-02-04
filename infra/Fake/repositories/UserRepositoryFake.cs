@@ -1,18 +1,21 @@
-using TechStore.Api.Security;
 using TechStore.Core.Entities;
+using TechStore.Core.Interfaces;
 
 namespace TechStore.Infra.Fake.Repositories;
 
 public class UserRepositoryFake
 {
-    // usuario admin seedado ao subir a API
-    private readonly User _admin = new()
+    private readonly User _admin;
+
+    public UserRepositoryFake(IPasswordHasher hasher)
     {
-        Login = "admin",
-        Email = "admin@techstore.com",
-        SenhaHash = HashService.GerarHash("Admin@123"),
-        Role = UserRole.Admin,
-    };
+        _admin = new User(
+            login: "admin",
+            email: "admin@techstore.com",
+            senhaHash: hasher.Hash("Admin@123"),
+            role: UserRole.Admin
+        );
+    }
 
     public User? BuscarPorLogin(string login)
     {

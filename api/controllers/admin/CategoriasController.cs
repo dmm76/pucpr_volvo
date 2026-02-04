@@ -1,7 +1,7 @@
 using Microsoft.AspNetCore.Mvc;
 using TechStore.Api.Auth;
 using TechStore.Api.Security;
-using TechStore.Core.Services;
+using TechStore.Core.useCases.categorias;
 
 namespace TechStore.Api.Controllers.Admin;
 
@@ -9,10 +9,10 @@ namespace TechStore.Api.Controllers.Admin;
 [Route("api/admin/categorias")]
 public class CategoriasController : ControllerBase
 {
-    private readonly CategoriaService _service;
+    private readonly CategoriaUseCases _service;
     private readonly AuthState _auth;
 
-    public CategoriasController(CategoriaService service, AuthState auth)
+    public CategoriasController(CategoriaUseCases service, AuthState auth)
     {
         _service = service;
         _auth = auth;

@@ -1,3 +1,5 @@
+using TechStore.Core.Exceptions;
+
 namespace TechStore.Core.Entities;
 
 public class Cliente
@@ -28,6 +30,32 @@ public class Cliente
         AtualizarNome(nome);
         AtualizarTelefone(telefone);
         DocumentoIdentidade = documentoIdentidade;
+    }
+
+    public void AtualizarNome(string nome)
+    {
+        if (string.IsNullOrWhiteSpace(nome))
+            throw new BusinessRuleException(ErrorCodes.ClienteNomeRequired);
+
+        var novo = nome.Trim();
+        if (Nome == novo)
+            return;
+
+        Nome = novo;
+        MarcarAtualizacao();
+    }
+
+    public void AtualizarTelefone(string telefone)
+    {
+        if (string.IsNullOrWhiteSpace(telefone))
+            throw new BusinessRuleException(ErrorCodes.ClienteTelefoneRequired);
+
+        var novo = telefone.Trim();
+        if (Telefone == novo)
+            return;
+
+        Telefone = novo;
+        MarcarAtualizacao();
     }
 
     public void MarcarAtualizacao() => DataAtualizacao = DateTime.UtcNow;

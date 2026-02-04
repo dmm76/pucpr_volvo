@@ -1,14 +1,16 @@
 using TechStore.Api.Auth;
 using TechStore.Api.Middleware;
+using TechStore.Api.Security;
 using TechStore.Core.Interfaces;
-using TechStore.Core.Services;
+using TechStore.Core.useCases.categorias;
 using TechStore.Infra.Fake.Repositories;
 
 var builder = WebApplication.CreateBuilder(args);
 
 //Controller Auth
-builder.Services.AddSingleton<AuthState>();
+builder.Services.AddScoped<AuthState>();
 builder.Services.AddSingleton<UserRepositoryFake>();
+builder.Services.AddSingleton<IPasswordHasher, PasswordHasher>();
 
 // Controllers + Swagger
 builder.Services.AddControllers();
@@ -17,7 +19,7 @@ builder.Services.AddSwaggerGen();
 
 // DI (Fake Infra)
 builder.Services.AddSingleton<ICategoriaRepository, CategoriaRepositoryFake>();
-builder.Services.AddSingleton<CategoriaService>();
+builder.Services.AddSingleton<CategoriaUseCases>();
 
 var app = builder.Build();
 
