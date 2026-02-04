@@ -1,4 +1,5 @@
 using System.Net;
+using TechStore.Api.Errors;
 using TechStore.Core.Exceptions;
 
 namespace TechStore.Api.Middleware;
@@ -17,32 +18,33 @@ public class ExceptionMiddleware
         }
         catch (NotFoundException ex)
         {
-            await WriteProblem(context, HttpStatusCode.NotFound, ex.Message);
+            await WriteProblem(context, HttpStatusCode.NotFound, ex.Code);
         }
         catch (BusinessRuleException ex)
         {
-            await WriteProblem(context, HttpStatusCode.BadRequest, ex.Message);
+            await WriteProblem(context, HttpStatusCode.BadRequest, ex.Code);
         }
         catch (Exception)
         {
             await WriteProblem(
                 context,
                 HttpStatusCode.InternalServerError,
-                "Erro interno inesperado."
+                ErrorCodes.InternalServerError
             );
         }
     }
 
-    private static async Task WriteProblem(HttpContext context, HttpStatusCode code, string message)
+    private static async Task WriteProblem(HttpContext context, HttpStatusCode status, string code)
     {
-        context.Response.StatusCode = (int)code;
+        context.Response.StatusCode = (int)status;
         context.Response.ContentType = "application/problem+json";
 
         var problem = new
         {
-            title = message,
-            status = (int)code,
+            title = ErrorMessagesPtBr.Get(code),
+            status = (int)status,
             traceId = context.TraceIdentifier,
+            code,
         };
 
         await context.Response.WriteAsJsonAsync(problem);

@@ -25,5 +25,11 @@ public static class CategoriaFactory
                 Nome = "Acessórios",
                 Descricao = "Fones de ouvido, carregadores, etc",
             },
+            new Categoria
+            {
+                Id = 4,
+                Nome = "Software",
+                Descricao = "Programas em geral",
+            },
         };
 }

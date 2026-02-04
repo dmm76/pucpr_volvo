@@ -2,6 +2,6 @@ namespace TechStore.Core.Exceptions;
 
 public sealed class BusinessRuleException : DomainException
 {
-    public BusinessRuleException(string message)
-        : base(message) { }
+    public BusinessRuleException(string code, string? message = null)
+        : base(code, message) { }
 }
