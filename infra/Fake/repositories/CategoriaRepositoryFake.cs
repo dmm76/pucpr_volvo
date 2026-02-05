@@ -6,22 +6,65 @@ namespace TechStore.Infra.Fake.Repositories;
 
 public class CategoriaRepositoryFake : ICategoriaRepository
 {
-    private readonly List<Categoria> _categorias;
+    private readonly List<Categoria> _data;
+    private int _nextId = 0;
 
     public CategoriaRepositoryFake()
     {
-        _categorias = CategoriaFactory.Criar();
+        _data = CategoriaFactory.Criar();
+
+        // atribui ids 1..N no seed
+        for (int i = 0; i < _data.Count; i++)
+        {
+            var id = i + 1;
+            FakeEntitySetter.SetPrivateId(_data[i], id);
+            _nextId = id;
+        }
     }
 
-    public List<Categoria> GetAll() => _categorias;
+    public Categoria? BuscarPorId(int id) => _data.FirstOrDefault(x => x.Id == id);
 
-    public Categoria? GetById(int id) => _categorias.FirstOrDefault(c => c.Id == id);
+    public List<Categoria> BuscarTodos() => _data.ToList();
 
-    public Categoria Add(Categoria categoria)
+    public Categoria Inserir(Categoria categoria)
     {
-        var novoId = _categorias.Count == 0 ? 1 : _categorias.Max(c => c.Id) + 1;
-        categoria.Id = novoId;
-        _categorias.Add(categoria);
+        if (categoria is null)
+            throw new ArgumentNullException(nameof(categoria));
+
+        var id = Interlocked.Increment(ref _nextId);
+        FakeEntitySetter.SetPrivateId(categoria, id);
+
+        _data.Add(categoria);
         return categoria;
+    }
+
+    public void Atualizar(Categoria categoria)
+    {
+        if (categoria is null)
+            return;
+
+        var idx = _data.FindIndex(x => x.Id == categoria.Id);
+        if (idx < 0)
+            return;
+
+        _data[idx] = categoria;
+    }
+
+    public void Remover(int id)
+    {
+        var c = BuscarPorId(id);
+        if (c is null)
+            return;
+
+        _data.Remove(c);
+    }
+
+    public bool ExisteNome(string nome)
+    {
+        if (string.IsNullOrWhiteSpace(nome))
+            return false;
+
+        var n = nome.Trim();
+        return _data.Any(x => x.Nome.Equals(n, StringComparison.OrdinalIgnoreCase));
     }
 }

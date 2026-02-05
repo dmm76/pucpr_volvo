@@ -52,7 +52,7 @@ public class Pedido
         if (existente is null)
         {
             // cria com snapshot (nome + preco atual)
-            var novo = new ItemPedido(pedidoId: 0, produto: produto, quantidade: quantidade);
+            var novo = new ItemPedido(produto, quantidade);
             // pedidoId pode ser setado pelo EF depois; 0 é ok aqui
             _itens.Add(novo);
         }

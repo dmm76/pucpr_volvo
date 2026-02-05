@@ -4,7 +4,12 @@ namespace TechStore.Core.Interfaces;
 
 public interface ICategoriaRepository
 {
-    List<Categoria> GetAll();
-    Categoria? GetById(int id);
-    Categoria Add(Categoria categoria);
+    Categoria? BuscarPorId(int id);
+    List<Categoria> BuscarTodos();
+
+    Categoria Inserir(Categoria categoria);
+    void Atualizar(Categoria categoria);
+    void Remover(int id);
+
+    bool ExisteNome(string nome);
 }

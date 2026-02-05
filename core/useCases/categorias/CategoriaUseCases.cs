@@ -15,11 +15,11 @@ public class CategoriaUseCases
     }
 
     public List<CategoriaDto> Listar() =>
-        _repo.GetAll().Select(c => new CategoriaDto(c.Id, c.Nome)).ToList();
+        _repo.BuscarTodos().Select(c => new CategoriaDto(c.Id, c.Nome)).ToList();
 
     public CategoriaDto BuscarPorId(int id)
     {
-        var c = _repo.GetById(id);
+        var c = _repo.BuscarPorId(id);
         if (c is null)
             throw new NotFoundException("Categoria não encontrada.");
 
@@ -31,7 +31,10 @@ public class CategoriaUseCases
         if (string.IsNullOrWhiteSpace(nome))
             throw new BusinessRuleException("Nome da categoria é obrigatório.");
 
-        var criada = _repo.Add(new Categoria { Nome = nome.Trim() });
+        if (_repo.ExisteNome(nome))
+            throw new BusinessRuleException("Já existe uma categoria com esse nome.");
+
+        var criada = _repo.Inserir(new Categoria(nome));
         return new CategoriaDto(criada.Id, criada.Nome);
     }
 }

@@ -8,8 +8,9 @@ using TechStore.Infra.Fake.Repositories;
 var builder = WebApplication.CreateBuilder(args);
 
 //Controller Auth
-builder.Services.AddScoped<AuthState>();
-builder.Services.AddSingleton<UserRepositoryFake>();
+builder.Services.AddSingleton<AuthState>();
+
+// builder.Services.AddSingleton<UserRepositoryFake>();
 builder.Services.AddSingleton<IPasswordHasher, PasswordHasher>();
 
 // Controllers + Swagger
@@ -19,6 +20,10 @@ builder.Services.AddSwaggerGen();
 
 // DI (Fake Infra)
 builder.Services.AddSingleton<ICategoriaRepository, CategoriaRepositoryFake>();
+builder.Services.AddSingleton<IProdutoRepository, ProdutoRepositoryFake>();
+builder.Services.AddSingleton<IClienteRepository, ClienteRepositoryFake>();
+builder.Services.AddSingleton<IPedidoRepository, PedidoRepositoryFake>();
+builder.Services.AddSingleton<IUserRepository, UserRepositoryFake>();
 builder.Services.AddSingleton<CategoriaUseCases>();
 
 var app = builder.Build();
@@ -34,7 +39,6 @@ app.UseHttpsRedirection();
 
 app.UseMiddleware<ExceptionMiddleware>();
 
-// Mapeia controllers
 app.MapControllers();
 
 app.Run();

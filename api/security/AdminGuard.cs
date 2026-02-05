@@ -12,7 +12,10 @@ public static class AdminGuard
             return new UnauthorizedObjectResult(new { message = "Usuario precisa estar logado." });
 
         if (auth.UserRole != UserRole.Admin)
-            return new UnauthorizedObjectResult(new { message = "Usuario precisa ser admin." });
+            return new ObjectResult(new { message = "Usuario precisa ser admin." })
+            {
+                StatusCode = 403,
+            };
 
         return null;
     }

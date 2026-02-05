@@ -6,7 +6,6 @@ C:\Users\Extreme\Desktop\Cesumar\ESTAGIO VOLVO - CODIGOS\TechStore\bin\Debug\net
 C:\Users\Extreme\Desktop\Cesumar\ESTAGIO VOLVO - CODIGOS\TechStore\bin\Debug\net10.0\TechStore.runtimeconfig.json
 C:\Users\Extreme\Desktop\Cesumar\ESTAGIO VOLVO - CODIGOS\TechStore\bin\Debug\net10.0\TechStore.dll
 C:\Users\Extreme\Desktop\Cesumar\ESTAGIO VOLVO - CODIGOS\TechStore\bin\Debug\net10.0\TechStore.pdb
-C:\Users\Extreme\Desktop\Cesumar\ESTAGIO VOLVO - CODIGOS\TechStore\bin\Debug\net10.0\Microsoft.AspNetCore.OpenApi.dll
 C:\Users\Extreme\Desktop\Cesumar\ESTAGIO VOLVO - CODIGOS\TechStore\bin\Debug\net10.0\Microsoft.OpenApi.dll
 C:\Users\Extreme\Desktop\Cesumar\ESTAGIO VOLVO - CODIGOS\TechStore\bin\Debug\net10.0\Swashbuckle.AspNetCore.Swagger.dll
 C:\Users\Extreme\Desktop\Cesumar\ESTAGIO VOLVO - CODIGOS\TechStore\bin\Debug\net10.0\Swashbuckle.AspNetCore.SwaggerGen.dll

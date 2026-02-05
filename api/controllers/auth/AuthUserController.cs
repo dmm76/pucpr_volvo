@@ -2,7 +2,6 @@ using Microsoft.AspNetCore.Mvc;
 using TechStore.Api.Auth;
 using TechStore.Api.Dtos;
 using TechStore.Core.Interfaces;
-using TechStore.Infra.Fake.Repositories;
 
 namespace TechStore.Api.Controllers.Auth;
 
@@ -10,11 +9,11 @@ namespace TechStore.Api.Controllers.Auth;
 [Route("api/auth")]
 public class AuthUserController : ControllerBase
 {
-    private readonly UserRepositoryFake _repo;
+    private readonly IUserRepository _repo;
     private readonly AuthState _auth;
     private readonly IPasswordHasher _hasher;
 
-    public AuthUserController(UserRepositoryFake repo, AuthState auth, IPasswordHasher hasher)
+    public AuthUserController(IUserRepository repo, AuthState auth, IPasswordHasher hasher)
     {
         _repo = repo;
         _auth = auth;
@@ -37,12 +36,13 @@ public class AuthUserController : ControllerBase
         _auth.Logar(user.Login, user.Email, user.Role);
 
         return Ok(
-            new UserLoginResponse(
-                "Usuario autenticado",
-                user.Login,
-                user.Email,
-                user.Role.ToString()
-            )
+            new
+            {
+                message = "Usuario autenticado",
+                login = user.Login,
+                email = user.Email,
+                role = user.Role.ToString(),
+            }
         );
     }
 

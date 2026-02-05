@@ -7,29 +7,9 @@ public static class CategoriaFactory
     public static List<Categoria> Criar() =>
         new()
         {
-            new Categoria
-            {
-                Id = 1,
-                Nome = "Periféricos",
-                Descricao = "Teclado, Mouse e etc",
-            },
-            new Categoria
-            {
-                Id = 2,
-                Nome = "Hardware",
-                Descricao = "Equipementos esseciais",
-            },
-            new Categoria
-            {
-                Id = 3,
-                Nome = "Acessórios",
-                Descricao = "Fones de ouvido, carregadores, etc",
-            },
-            new Categoria
-            {
-                Id = 4,
-                Nome = "Software",
-                Descricao = "Programas em geral",
-            },
+            new Categoria("Periféricos", "Teclado, Mouse e etc"),
+            new Categoria("Hardware", "Equipamentos essenciais"),
+            new Categoria("Acessórios", "Fones de ouvido, carregadores, etc"),
+            new Categoria("Software", "Programas em geral"),
         };
 }

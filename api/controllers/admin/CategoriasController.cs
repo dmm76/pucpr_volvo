@@ -35,11 +35,10 @@ public class CategoriasController : ControllerBase
         if (bloqueio is not null)
             return bloqueio;
 
-        var dto = _service.BuscarPorId(id);
-        return dto is null ? NotFound(new { message = "Categoria não encontrada", id }) : Ok(dto);
+        var dto = _service.BuscarPorId(id); // se não existir: NotFoundException
+        return Ok(dto);
     }
 
-    //request Dto - somente para receber nome da webapi
     public record CriarCategoriaRequest(string Nome);
 
     [HttpPost]
@@ -48,6 +47,9 @@ public class CategoriasController : ControllerBase
         var bloqueio = AdminGuard.BloquearSeNaoLogado(_auth);
         if (bloqueio is not null)
             return bloqueio;
+
+        if (request is null)
+            return BadRequest(new { message = "Body é obrigatório." });
 
         var dto = _service.Criar(request.Nome);
         return CreatedAtAction(nameof(GetById), new { id = dto.Id }, dto);
