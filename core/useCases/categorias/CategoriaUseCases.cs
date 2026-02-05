@@ -21,18 +21,18 @@ public class CategoriaUseCases
     {
         var c = _repo.BuscarPorId(id);
         if (c is null)
-            throw new NotFoundException("Categoria não encontrada.");
+            throw new NotFoundException(ErrorCodes.CategoriaNotFound);
 
         return new CategoriaDto(c.Id, c.Nome);
     }
 
     public CategoriaDto Criar(string nome)
     {
-        if (string.IsNullOrWhiteSpace(nome))
-            throw new BusinessRuleException("Nome da categoria é obrigatório.");
+        // if (string.IsNullOrWhiteSpace(nome))
+        //     throw new BusinessRuleException(ErrorCodes.CategoriaNomeRequired);
 
         if (_repo.ExisteNome(nome))
-            throw new BusinessRuleException("Já existe uma categoria com esse nome.");
+            throw new BusinessRuleException(ErrorCodes.CategoriaNomeAlreadyExists);
 
         var criada = _repo.Inserir(new Categoria(nome));
         return new CategoriaDto(criada.Id, criada.Nome);

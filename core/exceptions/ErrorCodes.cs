@@ -21,6 +21,13 @@ public static class ErrorCodes
     public const string ClienteTelefoneRequired = "CLIENTE_TELEFONE_REQUIRED";
     public const string ClienteNotFound = "CLIENTE_NOT_FOUND";
 
+    /// CATEGORY
+    public const string CategoriaNotFound = "CATEGORY_NOT_FOUND";
+    public const string CategoriaNomeRequired = "CATEGORY_NAME_REQUIRED";
+    public const string CategoriaNomeInvalidLength = "CATEGORY_NAME_INVALID_LENGTH";
+    public const string CategoriaDescricaoInvalidLength = "CATEGORY_DESCRIPTION_INVALID_LENGTH";
+    public const string CategoriaNomeAlreadyExists = "CATEGORY_NAME_ALREADY_EXISTS";
+
     // ENDERECO
     public const string EnderecoCepRequired = "ENDERECO_CEP_REQUIRED";
     public const string EnderecoCepInvalid = "ENDERECO_CEP_INVALID";
@@ -30,6 +37,8 @@ public static class ErrorCodes
     /// PRODUCT
     public const string ProductNotFound = "PRODUCT_NOT_FOUND";
     public const string ProductNameRequired = "PRODUCT_NAME_REQUIRED";
+
+    public const string ProductNameAlreadyExists = "PRODUCT_NAME_ALREADY_EXISTS";
     public const string ProductPriceInvalid = "PRODUCT_PRICE_INVALID";
     public const string ProductStockInvalid = "PRODUCT_STOCK_INVALID";
     public const string ProductCategoryInvalid = "PRODUCT_CATEGORY_INVALID";

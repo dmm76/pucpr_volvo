@@ -1,5 +1,6 @@
 using TechStore.Core.Entities;
 using TechStore.Core.Interfaces;
+using TechStore.Infra.Fake.Factories;
 
 namespace TechStore.Infra.Fake.Repositories;
 
@@ -8,9 +9,22 @@ public class ProdutoRepositoryFake : IProdutoRepository
     private readonly List<Produto> _data = new();
     private int _nextId = 0;
 
+    public ProdutoRepositoryFake()
+    {
+        _data = ProdutoFactory.Criar();
+
+        // atribui ids 1..N no seed
+        for (int i = 0; i < _data.Count; i++)
+        {
+            var id = i + 1;
+            FakeEntitySetter.SetPrivateId(_data[i], id);
+            _nextId = id;
+        }
+    }
+
     public Produto? BuscarPorId(int id) => _data.FirstOrDefault(x => x.Id == id);
 
-    public List<Produto> BuscarTodos() => _data.ToList();
+    public IReadOnlyList<Produto> BuscarTodos() => _data;
 
     public Produto Inserir(Produto produto)
     {
@@ -39,14 +53,14 @@ public class ProdutoRepositoryFake : IProdutoRepository
         _data.Remove(p);
     }
 
-    public bool ExisteNome(string nome)
+    public bool NomeJaExiste(string nome)
     {
         if (string.IsNullOrWhiteSpace(nome))
             return false;
         var n = nome.Trim();
-        return _data.Any(x => x.Nome.Equals(n, StringComparison.OrdinalIgnoreCase));
+        return _data.Any(x => x.Nome.Trim().Equals(n, StringComparison.OrdinalIgnoreCase));
     }
 
-    public List<Produto> BuscarPorCategoria(int categoriaId) =>
+    public IReadOnlyList<Produto> BuscarPorCategoria(int categoriaId) =>
         _data.Where(x => x.CategoriaId == categoriaId).ToList();
 }

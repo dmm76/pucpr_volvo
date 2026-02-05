@@ -9,7 +9,7 @@ public class Categoria
     public string? Descricao { get; private set; }
 
     public DateTime DataCriacao { get; private set; } = DateTime.UtcNow;
-    public DateTime DataAtualizacao { get; private set; } = DateTime.UtcNow;
+    public DateTime DataAtualizacao { get; private set; }
 
     protected Categoria() { }
 
@@ -22,12 +22,12 @@ public class Categoria
     public void AtualizarNome(string nome)
     {
         if (string.IsNullOrWhiteSpace(nome))
-            throw new BusinessRuleException("Nome da categoria é obrigatório.");
+            throw new BusinessRuleException(ErrorCodes.CategoriaNomeRequired);
 
         var n = nome.Trim();
 
         if (n.Length < 2 || n.Length > 80)
-            throw new BusinessRuleException("Nome da categoria deve ter entre 2 e 80 caracteres.");
+            throw new BusinessRuleException(ErrorCodes.CategoriaNomeInvalidLength);
 
         if (Nome == n)
             return;
@@ -41,9 +41,7 @@ public class Categoria
         var d = string.IsNullOrWhiteSpace(descricao) ? null : descricao.Trim();
 
         if (d is not null && d.Length > 200)
-            throw new BusinessRuleException(
-                "Descrição da categoria deve ter no máximo 200 caracteres."
-            );
+            throw new BusinessRuleException(ErrorCodes.CategoriaDescricaoInvalidLength);
 
         if (Descricao == d)
             return;

@@ -24,6 +24,15 @@ public static class ErrorMessagesPtBr
             ErrorCodes.ClienteTelefoneRequired => "Telefone do cliente e obrigatorio.",
             ErrorCodes.ClienteNotFound => "Cliente nao encontrado.",
 
+            // CATEGORY
+            ErrorCodes.CategoriaNotFound => "Categoria nao encontrada.",
+            ErrorCodes.CategoriaNomeRequired => "Nome da categoria e obrigatorio.",
+            ErrorCodes.CategoriaNomeInvalidLength =>
+                "Nome da categoria deve ter entre 2 e 80 caracteres.",
+            ErrorCodes.CategoriaDescricaoInvalidLength =>
+                "Descricao da categoria deve ter no maximo 200 caracteres.",
+            ErrorCodes.CategoriaNomeAlreadyExists => "Ja existe uma categoria com esse nome.",
+
             // ENDERECO
             ErrorCodes.EnderecoCepRequired => "CEP e obrigatorio.",
             ErrorCodes.EnderecoCepInvalid => "CEP invalido.",
@@ -33,6 +42,7 @@ public static class ErrorMessagesPtBr
             // PRODUCT
             ErrorCodes.ProductNotFound => "Produto nao encontrado.",
             ErrorCodes.ProductNameRequired => "Nome do produto e obrigatorio.",
+            ErrorCodes.ProductNameAlreadyExists => "O nome do produto já está em uso.",
             ErrorCodes.ProductPriceInvalid => "Preco do produto invalido.",
             ErrorCodes.ProductStockInvalid => "Estoque do produto invalido.",
             ErrorCodes.ProductCategoryInvalid => "Categoria do produto invalida.",
