@@ -27,6 +27,11 @@ public class Pedido
 
     protected Pedido() { }
 
+    public static Pedido CriarCarrinho()
+    {
+        return new Pedido();
+    }
+
     public void MarcarAtualizacao() => DataAtualizacao = DateTime.UtcNow;
 
     // 1) Adiciona item (se já existe o mesmo ProdutoId, soma quantidade)

@@ -3,6 +3,7 @@ using TechStore.Api.Middleware;
 using TechStore.Api.Security;
 using TechStore.Core.Interfaces;
 using TechStore.Core.useCases.categorias;
+using TechStore.Core.UseCases.Pedidos;
 using TechStore.Core.UseCases.Produtos;
 using TechStore.Infra.Fake.Repositories;
 
@@ -28,6 +29,8 @@ builder.Services.AddSingleton<IUserRepository, UserRepositoryFake>();
 builder.Services.AddSingleton<CategoriaUseCases>();
 
 builder.Services.AddSingleton<ProdutoUseCases>();
+
+builder.Services.AddSingleton<PedidoUseCases>();
 
 var app = builder.Build();
 
