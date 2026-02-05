@@ -10,10 +10,12 @@ namespace TechStore.Api.Controllers.Public;
 public class PedidosController : ControllerBase
 {
     private readonly PedidoUseCases _useCases;
+    private readonly CheckoutUseCases _checkout;
 
-    public PedidosController(PedidoUseCases useCases)
+    public PedidosController(PedidoUseCases useCases, CheckoutUseCases checkout)
     {
         _useCases = useCases;
+        _checkout = checkout;
     }
 
     [HttpPost]
@@ -43,6 +45,10 @@ public class PedidosController : ControllerBase
         [FromBody] SetEnderecoRequest request
     ) => Ok(_useCases.DefinirEnderecoEntrega(pedidoId, request.Endereco));
 
+    [HttpPut("{pedidoId:int}/usar-endereco-padrao/{clienteId:int}")]
+    public ActionResult<PedidoDetalheDto> UsarEnderecoPadrao(int pedidoId, int clienteId) =>
+        Ok(_checkout.UsarEnderecoPadraoEntrega(pedidoId, clienteId));
+
     [HttpPut("{pedidoId:int}/pagamento")]
     public ActionResult<PedidoDetalheDto> DefinirPagamento(
         int pedidoId,
@@ -53,8 +59,7 @@ public class PedidosController : ControllerBase
     public ActionResult<PedidoDetalheDto> IdentificarCliente(
         int pedidoId,
         [FromBody] IdentificarClienteRequest request
-    ) =>
-        Ok(_useCases.IdentificarCliente(pedidoId, request.ClienteId, request.CustomerNameSnapshot));
+    ) => Ok(_checkout.IdentificarClienteAutoSnapshot(pedidoId, request.ClienteId));
 
     [HttpPost("{pedidoId:int}/confirmar")]
     public ActionResult<PedidoDetalheDto> Confirmar(int pedidoId) =>

@@ -3,9 +3,11 @@ using TechStore.Api.Middleware;
 using TechStore.Api.Security;
 using TechStore.Core.Interfaces;
 using TechStore.Core.useCases.categorias;
+using TechStore.Core.UseCases.Clientes;
 using TechStore.Core.UseCases.Pedidos;
 using TechStore.Core.UseCases.Produtos;
 using TechStore.Infra.Fake.Repositories;
+using TechStore.Infra.Fake.Seed;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -32,7 +34,21 @@ builder.Services.AddSingleton<ProdutoUseCases>();
 
 builder.Services.AddSingleton<PedidoUseCases>();
 
+builder.Services.AddSingleton<ClienteUseCases>();
+
+builder.Services.AddSingleton<CheckoutUseCases>();
+
 var app = builder.Build();
+
+// SEED (Fake)
+using (var scope = app.Services.CreateScope())
+{
+    var userRepo = scope.ServiceProvider.GetRequiredService<IUserRepository>();
+    var clienteRepo = scope.ServiceProvider.GetRequiredService<IClienteRepository>();
+    var hasher = scope.ServiceProvider.GetRequiredService<IPasswordHasher>();
+
+    FakeSeedClientes.Seed(userRepo, clienteRepo, hasher);
+}
 
 // Pipeline
 if (app.Environment.IsDevelopment())

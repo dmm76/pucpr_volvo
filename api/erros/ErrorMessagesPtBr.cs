@@ -23,6 +23,8 @@ public static class ErrorMessagesPtBr
             ErrorCodes.ClienteNomeRequired => "Nome do cliente e obrigatorio.",
             ErrorCodes.ClienteTelefoneRequired => "Telefone do cliente e obrigatorio.",
             ErrorCodes.ClienteNotFound => "Cliente nao encontrado.",
+            ErrorCodes.ClienteDefaultShippingAddressNotFound =>
+                "Cliente não possui endereço padrão de entrega.",
 
             // CATEGORY
             ErrorCodes.CategoriaNotFound => "Categoria nao encontrada.",

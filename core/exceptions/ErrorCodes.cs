@@ -21,6 +21,9 @@ public static class ErrorCodes
     public const string ClienteTelefoneRequired = "CLIENTE_TELEFONE_REQUIRED";
     public const string ClienteNotFound = "CLIENTE_NOT_FOUND";
 
+    public const string ClienteDefaultShippingAddressNotFound =
+        "CLIENT_DEFAULT_SHIPPING_ADDRESS_NOT_FOUND";
+
     /// CATEGORY
     public const string CategoriaNotFound = "CATEGORY_NOT_FOUND";
     public const string CategoriaNomeRequired = "CATEGORY_NAME_REQUIRED";

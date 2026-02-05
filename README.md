@@ -1,3 +1,4 @@
+
 # 🖥️ TechStore API
 
 ### Backend arquitetado para um ecommerce moderno de informática
@@ -11,13 +12,13 @@
 O **TechStore** é uma Web API desenvolvida em **.NET**, projetada desde
 o início com **mentalidade arquitetural**, priorizando:
 
--   Domínio rico\
--   Separação de responsabilidades\
--   Previsibilidade\
--   Código sustentável\
--   Facilidade de evolução
+- Domínio rico  
+- Separação de responsabilidades  
+- Previsibilidade  
+- Código sustentável  
+- Facilidade de evolução  
 
-Este projeto não foi construído apenas para funcionar --- foi
+Este projeto não foi construído apenas para funcionar — foi
 estruturado para refletir **boas práticas utilizadas em sistemas
 profissionais.**
 
@@ -28,13 +29,13 @@ profissionais.**
 Construir uma API robusta de ecommerce aplicando conceitos reais de
 engenharia de software:
 
-✔️ Arquitetura em camadas\
-✔️ Entidades com comportamento\
-✔️ Controllers finos\
-✔️ Regras no domínio\
-✔️ Tratamento global de exceções\
-✔️ Segurança por autorização\
-✔️ Infraestrutura desacoplada
+✔️ Arquitetura em camadas  
+✔️ Entidades com comportamento  
+✔️ Controllers finos  
+✔️ Regras no domínio  
+✔️ Tratamento global de exceções  
+✔️ Segurança por autorização  
+✔️ Infraestrutura desacoplada  
 
 ------------------------------------------------------------------------
 
@@ -46,11 +47,11 @@ Este projeto segue dois princípios fundamentais:
 
 e
 
-> **Você não precisa começar perfeito --- apenas evitar erros
-> perigosos:** - estado público\
-> - regra espalhada\
-> - dependência acoplada\
-> - objetos anêmicos
+> **Você não precisa começar perfeito — apenas evitar erros perigosos:**  
+> - estado público  
+> - regra espalhada  
+> - dependência acoplada  
+> - objetos anêmicos  
 
 ------------------------------------------------------------------------
 
@@ -59,24 +60,27 @@ e
 O TechStore foi inspirado nos conceitos da **Clean Architecture**,
 mantendo o domínio como centro do sistema.
 
-    Controllers → UseCases → Domain → Repositories
+```
+Controllers → UseCases → Domain → Repositories
+```
 
 ### 🔵 Domain (Core)
 
 Contém as regras de negócio e entidades:
 
--   Categoria\
--   Produto\
--   Cliente\
--   Pedido\
--   ItemPedido\
--   User
+- Categoria  
+- Produto  
+- Cliente  
+- Endereco  
+- Pedido  
+- ItemPedido  
+- User  
 
 👉 Todas seguem o modelo:
 
-✅ `private set`\
-✅ métodos de domínio\
-✅ validações internas
+✅ `private set`  
+✅ métodos de domínio  
+✅ validações internas  
 
 Resultado: um sistema mais seguro e previsível.
 
@@ -86,11 +90,14 @@ Resultado: um sistema mais seguro e previsível.
 
 Responsáveis por orquestrar as operações do sistema.
 
-Exemplo:
+Exemplos:
 
--   Criar categoria\
--   Buscar categoria\
--   Listar categorias
+- Criar carrinho  
+- Adicionar itens  
+- Identificar cliente  
+- Definir endereço  
+- Confirmar pedido  
+- Realizar pagamento  
 
 Controllers não possuem regra de negócio.
 
@@ -100,9 +107,9 @@ Controllers não possuem regra de negócio.
 
 Durante a fase inicial, o projeto utiliza repositórios em memória para:
 
-✔️ acelerar o desenvolvimento\
-✔️ focar na arquitetura\
-✔️ evitar complexidade prematura
+✔️ acelerar o desenvolvimento  
+✔️ focar na arquitetura  
+✔️ evitar complexidade prematura  
 
 Uma evolução natural será a integração com **Entity Framework Core**.
 
@@ -116,8 +123,8 @@ O sistema possui proteção de rotas administrativas através do:
 
 Bloqueia acesso quando:
 
--   usuário não está logado\
--   usuário não é admin
+- usuário não está logado  
+- usuário não é admin  
 
 Garantindo consistência de autorização.
 
@@ -138,9 +145,9 @@ Porque arquitetura boa também significa:
 
 ### Evolução planejada:
 
-✔️ JWT\
-✔️ autenticação stateless\
-✔️ refresh tokens
+✔️ JWT  
+✔️ autenticação stateless  
+✔️ refresh tokens  
 
 ------------------------------------------------------------------------
 
@@ -150,11 +157,11 @@ Porque arquitetura boa também significa:
 
 Transforma exceções de domínio em respostas HTTP padronizadas:
 
-  Exception               Status
-  ----------------------- --------
-  BusinessRuleException   400
-  NotFoundException       404
-  Exception               500
+| Exception               | Status |
+|------------------------|--------|
+| BusinessRuleException  | 400    |
+| NotFoundException      | 404    |
+| Exception              | 500    |
 
 Isso torna a API muito mais previsível para quem consome.
 
@@ -163,69 +170,144 @@ Isso torna a API muito mais previsível para quem consome.
 ## 📦 Funcionalidades Implementadas
 
 ### ✔️ Autenticação
+- Login  
+- Logout  
+- Status  
 
--   Login\
--   Logout\
--   Status
-
-------------------------------------------------------------------------
+---
 
 ### ✔️ Categorias
+- Criar  
+- Listar  
+- Buscar por Id  
 
--   Criar\
--   Listar\
--   Buscar por Id
+---
 
-Com domínio protegido e validações.
+### ✔️ Produtos
+- Cadastro (admin)  
+- Listagem pública  
+- Busca por Id  
+- Validações de domínio  
+- Controle de estoque  
+
+---
+
+### ✔️ Clientes
+- Cadastro com criação automática de User  
+- Seed inicial com clientes e endereços  
+- Associação User ↔ Cliente  
+- Estrutura preparada para múltiplos endereços  
+
+---
+
+### ✔️ Carrinho / Pedido (Checkout Completo)
+
+Fluxo real de ecommerce implementado:
+
+✔️ Criar carrinho  
+✔️ Adicionar e remover itens  
+✔️ Snapshot do preço do produto  
+✔️ Identificação automática do cliente (snapshot do nome)  
+✔️ Snapshot do endereço de entrega  
+✔️ Atalho para usar endereço padrão  
+✔️ Definição de forma de pagamento  
+✔️ Validação de regras antes da confirmação  
+✔️ Baixa automática de estoque ao pagar  
+
+👉 O pedido preserva **snapshots**, garantindo histórico mesmo que os dados do cliente mudem.
 
 ------------------------------------------------------------------------
 
-## 🚧 Próximos Passos
+## 🔥 Diferenciais Arquiteturais
 
-O projeto está evoluindo de forma incremental e arquiteturalmente
-segura.
+Este projeto demonstra práticas vistas em sistemas profissionais:
 
-### Em desenvolvimento:
-
-🔥 Produto --- agregado central do ecommerce\
-🔥 Carrinho\
-🔥 Pedido\
-🔥 Persistência real\
-🔥 Logs estruturados\
-🔥 Cache\
-🔥 JWT
+✅ Domínio rico (não anêmico)  
+✅ Separação clara de camadas  
+✅ UseCases enxutos  
+✅ Controllers mínimos  
+✅ Middleware global  
+✅ ErrorCodes padronizados  
+✅ Tradução centralizada de erros  
+✅ Seed para facilitar demonstrações  
+✅ Checkout com comportamento real  
 
 ------------------------------------------------------------------------
 
-## 💡 Diferencial do Projeto
+## 🧪 Roteiro de Demonstração (Swagger)
 
-Este sistema foi construído com foco em:
+Fluxo recomendado para apresentação:
 
-👉 **pensamento de arquiteto, não apenas de programador.**
+### 1️⃣ Conferir dados
+```
+GET /api/clientes
+GET /api/produtos
+```
 
-Cada decisão busca equilibrar:
+### 2️⃣ Criar carrinho
+```
+POST /api/pedidos
+```
 
--   simplicidade\
--   clareza\
--   escalabilidade\
--   manutenibilidade
+### 3️⃣ Adicionar item
+```
+POST /api/pedidos/{pedidoId}/itens
+{
+  "produtoId": 1,
+  "quantidade": 2
+}
+```
+
+### 4️⃣ Identificar cliente (snapshot automático)
+```
+PUT /api/pedidos/{pedidoId}/cliente
+{
+  "clienteId": 1
+}
+```
+
+### 5️⃣ Usar endereço padrão (atalho premium)
+```
+PUT /api/pedidos/{pedidoId}/usar-endereco-padrao/1
+```
+
+### 6️⃣ Definir pagamento
+```
+PUT /api/pedidos/{pedidoId}/pagamento
+{
+  "formaPagamento": 1
+}
+```
+
+### 7️⃣ Confirmar e pagar
+```
+POST /api/pedidos/{pedidoId}/confirmar
+POST /api/pedidos/{pedidoId}/pagar
+```
+
+### 8️⃣ Provar baixa de estoque
+```
+GET /api/produtos/{id}
+```
+
+👉 Resultado esperado: estoque reduzido.
 
 ------------------------------------------------------------------------
 
 ## 🛠️ Tecnologias
 
--   .NET\
--   ASP.NET Core Web API\
--   Swagger\
--   C#\
--   Injeção de Dependência\
--   Middleware
+- .NET  
+- ASP.NET Core Web API  
+- Swagger  
+- C#  
+- Injeção de Dependência  
+- Middleware  
 
 ------------------------------------------------------------------------
 
 ## ▶️ Como Executar
 
-``` bash
+```bash
 dotnet build
 dotnet run
 ```
@@ -240,9 +322,9 @@ Acesse:
 
 O projeto possui documentação complementar:
 
--   📄 ARCHITECTURE.md\
--   📄 DECISIONS.md\
--   📄 PROJECT_OVERVIEW.md
+- 📄 ARCHITECTURE.md  
+- 📄 DECISIONS.md  
+- 📄 PROJECT_OVERVIEW.md  
 
 Esses arquivos registram as decisões técnicas e o estado arquitetural do
 sistema.
@@ -251,8 +333,8 @@ sistema.
 
 ## 👨‍💻 Autor
 
-**Douglas Marcelo Monquero**\
-Engenharia de Software
+**Douglas Marcelo Monquero**  
+Engenharia de Software  
 
 Desenvolvendo software com mentalidade de longo prazo.
 
@@ -264,6 +346,6 @@ Este projeto representa mais do que código.
 
 Representa a transição de:
 
-👉 *aprender a programar*\
-para\
+👉 *aprender a programar*  
+para  
 👉 **aprender a construir sistemas.**

@@ -8,4 +8,4 @@ public record SetEnderecoRequest(string Endereco);
 
 public record SetPagamentoRequest(FormaPagamento FormaPagamento);
 
-public record IdentificarClienteRequest(int ClienteId, string CustomerNameSnapshot);
+public record IdentificarClienteRequest(int ClienteId);
