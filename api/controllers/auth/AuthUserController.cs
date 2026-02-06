@@ -10,12 +10,19 @@ namespace TechStore.Api.Controllers.Auth;
 public class AuthUserController : ControllerBase
 {
     private readonly IUserRepository _repo;
+    private readonly IClienteRepository _clienteRepo;
     private readonly AuthState _auth;
     private readonly IPasswordHasher _hasher;
 
-    public AuthUserController(IUserRepository repo, AuthState auth, IPasswordHasher hasher)
+    public AuthUserController(
+        IUserRepository repo,
+        IClienteRepository clienteRepo,
+        AuthState auth,
+        IPasswordHasher hasher
+    )
     {
         _repo = repo;
+        _clienteRepo = clienteRepo;
         _auth = auth;
         _hasher = hasher;
     }
@@ -30,15 +37,19 @@ public class AuthUserController : ControllerBase
         if (user is null)
             return Unauthorized(new { message = "Login invalido." });
 
+        var cliente = _clienteRepo.BuscarPorUserId(user.Id);
+
         if (!_hasher.Verify(req.Senha, user.SenhaHash))
             return Unauthorized(new { message = "Senha invalida." });
 
-        _auth.Logar(user.Login, user.Email, user.Role);
+        _auth.Logar(user.Id, user.Login, user.Email, user.Role, cliente?.Id);
 
         return Ok(
             new
             {
                 message = "Usuario autenticado",
+                userId = user.Id,
+                clienteId = cliente?.Id,
                 login = user.Login,
                 email = user.Email,
                 role = user.Role.ToString(),
@@ -59,6 +70,8 @@ public class AuthUserController : ControllerBase
             new
             {
                 userLogado = _auth.UserLogado,
+                userId = _auth.UserId,
+                clienteId = _auth.ClienteId,
                 login = _auth.UserLogin,
                 email = _auth.UserEmail,
                 role = _auth.UserRole?.ToString(),

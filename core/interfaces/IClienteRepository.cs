@@ -5,6 +5,8 @@ namespace TechStore.Core.Interfaces;
 public interface IClienteRepository
 {
     Cliente? BuscarPorId(int id);
+
+    Cliente? BuscarPorUserId(int userId);
     List<Cliente> BuscarTodos();
 
     Cliente Inserir(Cliente cliente);

@@ -52,6 +52,15 @@ public class PedidoUseCases
         return Map(pedido);
     }
 
+    public int? BuscarClienteIdDoPedido(int pedidoId)
+    {
+        var pedido =
+            _pedidoRepo.BuscarPorId(pedidoId)
+            ?? throw new NotFoundException(ErrorCodes.OrderNotFound);
+
+        return pedido.ClienteId;
+    }
+
     public PedidoDetalheDto RemoverItem(int pedidoId, int produtoId)
     {
         var pedido =

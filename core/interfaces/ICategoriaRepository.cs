@@ -5,6 +5,7 @@ namespace TechStore.Core.Interfaces;
 public interface ICategoriaRepository
 {
     Categoria? BuscarPorId(int id);
+
     List<Categoria> BuscarTodos();
 
     Categoria Inserir(Categoria categoria);

@@ -10,6 +10,8 @@ public class ClienteRepositoryFake : IClienteRepository
 
     public Cliente? BuscarPorId(int id) => _data.FirstOrDefault(x => x.Id == id);
 
+    public Cliente? BuscarPorUserId(int userId) => _data.FirstOrDefault(x => x.UserId == userId);
+
     public List<Cliente> BuscarTodos() => _data.ToList();
 
     public Cliente Inserir(Cliente cliente)
