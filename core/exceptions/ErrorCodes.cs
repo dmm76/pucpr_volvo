@@ -47,6 +47,7 @@ public static class ErrorCodes
     public const string ProductCategoryInvalid = "PRODUCT_CATEGORY_INVALID";
     public const string ProductInactive = "PRODUCT_INACTIVE";
     public const string ProductNameInvalidLength = "PRODUCT_NAME_INVALID_LENGTH";
+    public const string ProductDescriptionInvalidLength = "PRODUCT_DESCRIPTION_INVALID_LENGTH";
 
     // ORDER (Pedido)
     public const string OrderNotFound = "ORDER_NOT_FOUND";

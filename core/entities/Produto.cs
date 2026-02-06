@@ -65,7 +65,13 @@ public class Produto
 
     public void AtualizarDescricao(string? descricao)
     {
-        Descricao = string.IsNullOrWhiteSpace(descricao) ? null : descricao.Trim();
+        var d = string.IsNullOrWhiteSpace(descricao) ? null : descricao.Trim();
+
+        if (d is not null && d.Length > 200)
+            throw new BusinessRuleException(ErrorCodes.ProductDescriptionInvalidLength);
+
+        Descricao = d;
+
         MarcarAtualizacao();
     }
 

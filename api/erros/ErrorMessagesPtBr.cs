@@ -51,6 +51,9 @@ public static class ErrorMessagesPtBr
             ErrorCodes.ProductInactive => "Produto inativo.",
             ErrorCodes.ProductNameInvalidLength => "Nome precisa ter entre 2 a 120 caracteres.",
 
+            ErrorCodes.ProductDescriptionInvalidLength =>
+                "Descrição do produto deve ter no máximo 200 caracteres.",
+
             // ORDER
             ErrorCodes.OrderNotFound => "Pedido nao encontrado.",
             ErrorCodes.OrderItemsRequired => "Pedido deve ter ao menos um item.",
