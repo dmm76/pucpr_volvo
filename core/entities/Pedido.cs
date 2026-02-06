@@ -34,7 +34,6 @@ public class Pedido
 
     public void MarcarAtualizacao() => DataAtualizacao = DateTime.UtcNow;
 
-    // 1) Adiciona item (se já existe o mesmo ProdutoId, soma quantidade)
     public void AdicionarItem(Produto produto, int quantidade)
     {
         GarantirStatus(StatusPedido.Carrinho);
@@ -75,7 +74,6 @@ public class Pedido
         MarcarAtualizacao();
     }
 
-    // 2) Remove item
     public void RemoverItem(int produtoId)
     {
         GarantirStatus(StatusPedido.Carrinho);
@@ -90,7 +88,6 @@ public class Pedido
         MarcarAtualizacao();
     }
 
-    // 3) Define/atualiza pagamento (só no carrinho)
     public void DefinirFormaPagamento(FormaPagamento paymentMethod)
     {
         GarantirStatus(StatusPedido.Carrinho);
@@ -99,7 +96,6 @@ public class Pedido
         MarcarAtualizacao();
     }
 
-    // 4) Define endereço snapshot (só no carrinho)
     public void DefinirEnderecoEntregaSnapshot(string enderecoTexto)
     {
         GarantirStatus(StatusPedido.Carrinho);
@@ -111,7 +107,6 @@ public class Pedido
         MarcarAtualizacao();
     }
 
-    // 5) Identifica o cliente (na hora de fechar)
     public void IdentificarCliente(int clienteId, string customerNameSnapshot)
     {
         GarantirStatus(StatusPedido.Carrinho);
@@ -127,7 +122,7 @@ public class Pedido
         MarcarAtualizacao();
     }
 
-    // 6) Confirmar (Carrinho -> Pendente) - valida itens/cliente/endereço/pagamento
+    // Confirmar (Carrinho -> Pendente) - valida itens/cliente/endereço/pagamento
     public void Confirmar()
     {
         GarantirStatus(StatusPedido.Carrinho);
@@ -151,7 +146,7 @@ public class Pedido
         MarcarAtualizacao();
     }
 
-    // 7) Marcar como pago (Pendente -> Pago) - valida estoque novamente e baixa estoque
+    // Marcar como pago (Pendente -> Pago) - valida estoque novamente e baixa estoque
     public void MarcarComoPago(IEnumerable<Produto> produtosDoPedido)
     {
         GarantirStatus(StatusPedido.Pendente);
