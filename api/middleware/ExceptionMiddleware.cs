@@ -7,8 +7,13 @@ namespace TechStore.Api.Middleware;
 public class ExceptionMiddleware
 {
     private readonly RequestDelegate _next;
+    private readonly ILogger<ExceptionMiddleware> _logger;
 
-    public ExceptionMiddleware(RequestDelegate next) => _next = next;
+    public ExceptionMiddleware(RequestDelegate next, ILogger<ExceptionMiddleware> logger)
+    {
+        _next = next;
+        _logger = logger;
+    }
 
     public async Task Invoke(HttpContext context)
     {
@@ -18,14 +23,34 @@ public class ExceptionMiddleware
         }
         catch (NotFoundException ex)
         {
+            _logger.LogInformation(
+                ex,
+                "NotFoundException: {Code}. TraceId: {TraceId}",
+                ex.Code,
+                context.TraceIdentifier
+            );
+
             await WriteProblem(context, HttpStatusCode.NotFound, ex.Code);
         }
         catch (BusinessRuleException ex)
         {
+            _logger.LogWarning(
+                ex,
+                "BusinessRuleException: {Code}. TraceId: {TraceId}",
+                ex.Code,
+                context.TraceIdentifier
+            );
+
             await WriteProblem(context, HttpStatusCode.BadRequest, ex.Code);
         }
-        catch (Exception)
+        catch (Exception ex)
         {
+            _logger.LogError(
+                ex,
+                "Unhandled exception. TraceId: {TraceId}",
+                context.TraceIdentifier
+            );
+
             await WriteProblem(
                 context,
                 HttpStatusCode.InternalServerError,
@@ -39,9 +64,18 @@ public class ExceptionMiddleware
         context.Response.StatusCode = (int)status;
         context.Response.ContentType = "application/problem+json";
 
+        // Header extra pra facilitar copiar/achar nos logs
+        context.Response.Headers["X-Trace-Id"] = context.TraceIdentifier;
+
+        var title = ErrorMessagesPtBr.Get(code);
+
+        // se não traduzido, title == code
+        if (title == code)
+            title = (int)status < 500 ? "Requisição inválida." : "Erro interno inesperado.";
+
         var problem = new
         {
-            title = ErrorMessagesPtBr.Get(code),
+            title,
             status = (int)status,
             traceId = context.TraceIdentifier,
             code,

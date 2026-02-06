@@ -67,6 +67,9 @@ public static class ErrorMessagesPtBr
             ErrorCodes.OrderItemQuantityInvalid => "Quantidade do item invalida.",
             ErrorCodes.OrderItemInsufficientStock => "Estoque insuficiente para o item do pedido.",
 
+            //PERFIL
+            ErrorCodes.UserRoleInvalid => "Perfil do usuário informado é inválido.",
+
             // fallback
             _ => code,
         };

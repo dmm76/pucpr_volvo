@@ -1,3 +1,4 @@
+using TechStore.Core.Enums;
 using TechStore.Core.Exceptions;
 
 namespace TechStore.Core.Entities;
@@ -76,6 +77,9 @@ public class User
 
     public void DefinirRole(UserRole role)
     {
+        if (!Enum.IsDefined(typeof(UserRole), role))
+            throw new BusinessRuleException(ErrorCodes.UserRoleInvalid);
+
         if (Role == role)
             return;
 

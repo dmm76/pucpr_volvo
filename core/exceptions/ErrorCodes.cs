@@ -60,4 +60,7 @@ public static class ErrorCodes
     public const string OrderItemProductRequired = "ORDER_ITEM_PRODUCT_REQUIRED";
     public const string OrderItemQuantityInvalid = "ORDER_ITEM_QUANTITY_INVALID";
     public const string OrderItemInsufficientStock = "ORDER_ITEM_INSUFFICIENT_STOCK";
+
+    //ROLE
+    public const string UserRoleInvalid = "USER_ROLE_INVALID";
 }
