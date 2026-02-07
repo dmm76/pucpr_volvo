@@ -1,5 +1,7 @@
 using Microsoft.AspNetCore.Mvc;
+using TechStore.Api.Auth;
 using TechStore.Api.Dtos;
+using TechStore.Api.Security;
 using TechStore.Core.Dtos;
 using TechStore.Core.Entities;
 using TechStore.Core.UseCases.Clientes;
@@ -10,10 +12,12 @@ namespace TechStore.Api.Controllers.Public;
 [Route("api/clientes")]
 public class ClientesController : ControllerBase
 {
+    private readonly AuthState _auth;
     private readonly ClienteUseCases _useCases;
 
-    public ClientesController(ClienteUseCases useCases)
+    public ClientesController(AuthState auth, ClienteUseCases useCases)
     {
+        _auth = auth;
         _useCases = useCases;
     }
 
@@ -24,8 +28,6 @@ public class ClientesController : ControllerBase
 
         if (req.Endereco is not null)
         {
-            // clienteId ainda não existe aqui -> vamos criar o endereço com clienteId=0
-            // e depois o domínio guarda dentro do cliente (fake). No EF, isso vira 1-N correto.
             endereco = new Endereco(
                 clienteId: 0,
                 descricao: req.Endereco.Descricao,
@@ -56,13 +58,26 @@ public class ClientesController : ControllerBase
             enderecoOpcional: endereco
         );
 
-        return CreatedAtAction(nameof(BuscarPorId), new { id = dto.Id }, dto);
+        return CreatedAtAction(nameof(BuscarPorId), new { clienteId = dto.Id }, dto);
     }
 
-    [HttpGet("{id:int}")]
-    public ActionResult<ClienteDetalheDto> BuscarPorId(int id) => Ok(_useCases.BuscarPorId(id));
-
     [HttpGet]
-    public ActionResult<IReadOnlyList<ClienteDetalheDto>> BuscarTodos() =>
-        Ok(_useCases.BuscarTodos());
+    public IActionResult BuscarTodos()
+    {
+        var block = AdminGuard.BloquearSeNaoLogado(_auth);
+        if (block is not null)
+            return block;
+
+        return Ok(_useCases.BuscarTodos());
+    }
+
+    [HttpGet("{clienteId:int}")]
+    public IActionResult BuscarPorId(int clienteId)
+    {
+        var block = OwnershipGuard.BloquearSeNaoDonoOuAdmin(_auth, clienteId);
+        if (block is not null)
+            return block;
+
+        return Ok(_useCases.BuscarPorId(clienteId));
+    }
 }

@@ -37,10 +37,10 @@ public class AuthUserController : ControllerBase
         if (user is null)
             return Unauthorized(new { message = "Login invalido." });
 
-        var cliente = _clienteRepo.BuscarPorUserId(user.Id);
-
         if (!_hasher.Verify(req.Senha, user.SenhaHash))
             return Unauthorized(new { message = "Senha invalida." });
+
+        var cliente = _clienteRepo.BuscarPorUserId(user.Id);
 
         _auth.Logar(user.Id, user.Login, user.Email, user.Role, cliente?.Id);
 

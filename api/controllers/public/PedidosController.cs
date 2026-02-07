@@ -1,5 +1,7 @@
 using Microsoft.AspNetCore.Mvc;
+using TechStore.Api.Auth;
 using TechStore.Api.Dtos;
+using TechStore.Api.Security;
 using TechStore.Core.Dtos;
 using TechStore.Core.UseCases.Pedidos;
 
@@ -9,11 +11,13 @@ namespace TechStore.Api.Controllers.Public;
 [Route("api/pedidos")]
 public class PedidosController : ControllerBase
 {
+    private readonly AuthState _auth;
     private readonly PedidoUseCases _useCases;
     private readonly CheckoutUseCases _checkout;
 
-    public PedidosController(PedidoUseCases useCases, CheckoutUseCases checkout)
+    public PedidosController(AuthState auth, PedidoUseCases useCases, CheckoutUseCases checkout)
     {
+        _auth = auth;
         _useCases = useCases;
         _checkout = checkout;
     }
@@ -22,12 +26,31 @@ public class PedidosController : ControllerBase
     public ActionResult<PedidoDetalheDto> CriarCarrinho() => Ok(_useCases.CriarCarrinho());
 
     [HttpGet("{pedidoId:int}")]
-    public ActionResult<PedidoDetalheDto> BuscarPorId(int pedidoId) =>
-        Ok(_useCases.BuscarPorId(pedidoId));
+    public IActionResult BuscarPorId(int pedidoId)
+    {
+        var clienteIdDoPedido = _useCases.BuscarClienteIdDoPedido(pedidoId);
+
+        if (clienteIdDoPedido is not null) // só trava quando já tem dono
+        {
+            var block = OwnershipGuard.BloquearSeNaoDonoOuAdmin(_auth, clienteIdDoPedido);
+            if (block is not null)
+                return block;
+        }
+
+        var dto = _useCases.BuscarPorId(pedidoId);
+        return Ok(dto);
+    }
 
     [HttpGet("cliente/{clienteId:int}")]
-    public ActionResult<IReadOnlyList<PedidoDetalheDto>> BuscarPorCliente(int clienteId) =>
-        Ok(_useCases.BuscarPorCliente(clienteId));
+    public IActionResult BuscarPorCliente(int clienteId)
+    {
+        var block = OwnershipGuard.BloquearSeNaoDonoOuAdmin(_auth, clienteId);
+        if (block is not null)
+            return block;
+
+        var lista = _useCases.BuscarPorCliente(clienteId);
+        return Ok(lista);
+    }
 
     [HttpPost("{pedidoId:int}/itens")]
     public ActionResult<PedidoDetalheDto> AdicionarItem(
