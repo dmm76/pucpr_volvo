@@ -19,6 +19,15 @@ public class PedidoUseCases
 
     public PedidoDetalheDto CriarCarrinho(Guid? visitorId)
     {
+        //se já existe carrinho aberto para esse visitante, reusa
+        if (visitorId is not null)
+        {
+            var existente = _pedidoRepo.BuscarCarrinhoPorVisitorId(visitorId.Value);
+            if (existente is not null)
+                return Map(existente);
+        }
+
+        //senão cria novo (o domínio gera VisitorId se vier null)
         var pedido = Pedido.CriarCarrinho(visitorId);
         _pedidoRepo.Inserir(pedido);
         return Map(pedido);

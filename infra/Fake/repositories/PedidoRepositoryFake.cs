@@ -1,4 +1,5 @@
 using TechStore.Core.Entities;
+using TechStore.Core.Enums;
 using TechStore.Core.Interfaces;
 
 namespace TechStore.Infra.Fake.Repositories;
@@ -41,4 +42,7 @@ public class PedidoRepositoryFake : IPedidoRepository
 
     public List<Pedido> BuscarPorCliente(int clienteId) =>
         _data.Where(x => x.ClienteId == clienteId).ToList();
+
+    public Pedido? BuscarCarrinhoPorVisitorId(Guid visitorId) =>
+        _data.FirstOrDefault(p => p.Status == StatusPedido.Carrinho && p.VisitorId == visitorId);
 }

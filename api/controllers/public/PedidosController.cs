@@ -24,9 +24,6 @@ public class PedidosController : ControllerBase
         _checkout = checkout;
     }
 
-    // =========================================
-    // Helpers (sem criar classe nova)
-    // =========================================
     private Guid? GetVisitorIdFromHeader()
     {
         Request.Headers.TryGetValue(VisitorHeaderName, out var header);
@@ -44,10 +41,6 @@ public class PedidosController : ControllerBase
             visitorId
         );
     }
-
-    // =========================================
-    // Endpoints
-    // =========================================
 
     [HttpPost]
     public ActionResult<PedidoDetalheDto> CriarCarrinho()
@@ -163,9 +156,12 @@ public class PedidosController : ControllerBase
 
         //ainda valida acesso ao pedido antes de mexer
         var dtoAtual = _useCases.BuscarPorId(pedidoId);
-        var block = BloquearSeNaoPodeAcessarPedido(dtoAtual);
-        if (block is not null)
-            return block;
+        if (dtoAtual.ClienteId is not null)
+        {
+            var block = BloquearSeNaoPodeAcessarPedido(dtoAtual);
+            if (block is not null)
+                return block;
+        }
 
         var dto = _checkout.IdentificarClienteAutoSnapshot(pedidoId, request.ClienteId);
         return Ok(dto);

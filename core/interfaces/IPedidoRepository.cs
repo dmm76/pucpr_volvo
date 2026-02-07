@@ -12,4 +12,7 @@ public interface IPedidoRepository
     void Remover(int id);
 
     List<Pedido> BuscarPorCliente(int clienteId);
+
+    //evitar pedidos infinitos - muito importante para evitar pedidos fantasmas
+    Pedido? BuscarCarrinhoPorVisitorId(Guid visitorId);
 }
