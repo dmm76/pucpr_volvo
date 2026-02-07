@@ -10,6 +10,8 @@ public class Pedido
     public StatusPedido Status { get; private set; } = StatusPedido.Carrinho;
 
     public int? ClienteId { get; private set; }
+    public Guid? VisitorId { get; private set; }
+    public bool EhVisitante => VisitorId is not null;
     public string? CustomerNameSnapshot { get; private set; }
     public string? ShippingAddressSnapshot { get; private set; }
 
@@ -27,9 +29,9 @@ public class Pedido
 
     protected Pedido() { }
 
-    public static Pedido CriarCarrinho()
+    public static Pedido CriarCarrinho(Guid? visitorId = null)
     {
-        return new Pedido();
+        return new Pedido { VisitorId = visitorId ?? Guid.NewGuid() };
     }
 
     public void MarcarAtualizacao() => DataAtualizacao = DateTime.UtcNow;
@@ -119,6 +121,7 @@ public class Pedido
 
         ClienteId = clienteId;
         CustomerNameSnapshot = customerNameSnapshot.Trim();
+        VisitorId = null;
         MarcarAtualizacao();
     }
 

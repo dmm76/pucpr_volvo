@@ -14,6 +14,7 @@ public record PedidoDetalheDto(
     int Id,
     StatusPedido Status,
     int? ClienteId,
+    Guid? VisitorId,
     string? CustomerNameSnapshot,
     string? ShippingAddressSnapshot,
     FormaPagamento? PaymentMethod,

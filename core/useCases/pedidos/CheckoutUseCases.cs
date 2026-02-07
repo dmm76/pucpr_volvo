@@ -1,4 +1,5 @@
 using TechStore.Core.Dtos;
+using TechStore.Core.Entities;
 using TechStore.Core.Exceptions;
 using TechStore.Core.Interfaces;
 
@@ -36,26 +37,7 @@ public class CheckoutUseCases
         pedido.DefinirEnderecoEntregaSnapshot(snapshot);
         _pedidoRepo.Atualizar(pedido);
 
-        // ✅ evita duplicar Map: reaproveita o BuscarPorId do repositório e monta aqui simples
-        // (ou você move o "Map" para um mapper helper depois)
-        return new PedidoDetalheDto(
-            pedido.Id,
-            pedido.Status,
-            pedido.ClienteId,
-            pedido.CustomerNameSnapshot,
-            pedido.ShippingAddressSnapshot,
-            pedido.PaymentMethod,
-            pedido.Total,
-            pedido
-                .Itens.Select(i => new ItemPedidoDto(
-                    i.ProdutoId,
-                    i.NomeProdutoSnapshot,
-                    i.PrecoUnitarioSnapshot,
-                    i.Quantidade,
-                    i.SubTotal
-                ))
-                .ToList()
-        );
+        return Map(pedido);
     }
 
     public PedidoDetalheDto IdentificarClienteAutoSnapshot(int pedidoId, int clienteId)
@@ -72,10 +54,15 @@ public class CheckoutUseCases
         pedido.IdentificarCliente(cliente.Id, cliente.Nome);
         _pedidoRepo.Atualizar(pedido);
 
-        return new PedidoDetalheDto(
+        return Map(pedido);
+    }
+
+    private static PedidoDetalheDto Map(Pedido pedido) =>
+        new(
             pedido.Id,
             pedido.Status,
             pedido.ClienteId,
+            pedido.VisitorId,
             pedido.CustomerNameSnapshot,
             pedido.ShippingAddressSnapshot,
             pedido.PaymentMethod,
@@ -90,5 +77,4 @@ public class CheckoutUseCases
                 ))
                 .ToList()
         );
-    }
 }

@@ -17,9 +17,9 @@ public class PedidoUseCases
         _produtoRepo = produtoRepo;
     }
 
-    public PedidoDetalheDto CriarCarrinho()
+    public PedidoDetalheDto CriarCarrinho(Guid? visitorId)
     {
-        var pedido = Pedido.CriarCarrinho();
+        var pedido = Pedido.CriarCarrinho(visitorId);
         _pedidoRepo.Inserir(pedido);
         return Map(pedido);
     }
@@ -52,14 +52,14 @@ public class PedidoUseCases
         return Map(pedido);
     }
 
-    public int? BuscarClienteIdDoPedido(int pedidoId)
-    {
-        var pedido =
-            _pedidoRepo.BuscarPorId(pedidoId)
-            ?? throw new NotFoundException(ErrorCodes.OrderNotFound);
+    // public int? BuscarClienteIdDoPedido(int pedidoId)
+    // {
+    //     var pedido =
+    //         _pedidoRepo.BuscarPorId(pedidoId)
+    //         ?? throw new NotFoundException(ErrorCodes.OrderNotFound);
 
-        return pedido.ClienteId;
-    }
+    //     return pedido.ClienteId;
+    // }
 
     public PedidoDetalheDto RemoverItem(int pedidoId, int produtoId)
     {
@@ -155,6 +155,7 @@ public class PedidoUseCases
             p.Id,
             p.Status,
             p.ClienteId,
+            p.VisitorId,
             p.CustomerNameSnapshot,
             p.ShippingAddressSnapshot,
             p.PaymentMethod,

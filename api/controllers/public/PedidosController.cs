@@ -11,6 +11,8 @@ namespace TechStore.Api.Controllers.Public;
 [Route("api/pedidos")]
 public class PedidosController : ControllerBase
 {
+    private const string VisitorHeaderName = "X-Visitor-Id";
+
     private readonly AuthState _auth;
     private readonly PedidoUseCases _useCases;
     private readonly CheckoutUseCases _checkout;
@@ -22,22 +24,53 @@ public class PedidosController : ControllerBase
         _checkout = checkout;
     }
 
+    // =========================================
+    // Helpers (sem criar classe nova)
+    // =========================================
+    private Guid? GetVisitorIdFromHeader()
+    {
+        Request.Headers.TryGetValue(VisitorHeaderName, out var header);
+        return Guid.TryParse(header, out var parsed) ? parsed : null;
+    }
+
+    private IActionResult? BloquearSeNaoPodeAcessarPedido(PedidoDetalheDto dto)
+    {
+        var visitorId = GetVisitorIdFromHeader();
+
+        return OwnershipGuard.BloquearSeNaoDonoAdminOuVisitante(
+            _auth,
+            dto.ClienteId,
+            dto.VisitorId,
+            visitorId
+        );
+    }
+
+    // =========================================
+    // Endpoints
+    // =========================================
+
     [HttpPost]
-    public ActionResult<PedidoDetalheDto> CriarCarrinho() => Ok(_useCases.CriarCarrinho());
+    public ActionResult<PedidoDetalheDto> CriarCarrinho()
+    {
+        var visitorId = GetVisitorIdFromHeader();
+
+        var dto = _useCases.CriarCarrinho(visitorId);
+
+        // devolve o "ticket" do carrinho para o cliente reutilizar nas próximas chamadas
+        Response.Headers[VisitorHeaderName] = dto.VisitorId!.ToString();
+
+        return Ok(dto);
+    }
 
     [HttpGet("{pedidoId:int}")]
     public IActionResult BuscarPorId(int pedidoId)
     {
-        var clienteIdDoPedido = _useCases.BuscarClienteIdDoPedido(pedidoId);
-
-        if (clienteIdDoPedido is not null) // só trava quando já tem dono
-        {
-            var block = OwnershipGuard.BloquearSeNaoDonoOuAdmin(_auth, clienteIdDoPedido);
-            if (block is not null)
-                return block;
-        }
-
         var dto = _useCases.BuscarPorId(pedidoId);
+
+        var block = BloquearSeNaoPodeAcessarPedido(dto);
+        if (block is not null)
+            return block;
+
         return Ok(dto);
     }
 
@@ -53,41 +86,145 @@ public class PedidosController : ControllerBase
     }
 
     [HttpPost("{pedidoId:int}/itens")]
-    public ActionResult<PedidoDetalheDto> AdicionarItem(
-        int pedidoId,
-        [FromBody] AddItemRequest request
-    ) => Ok(_useCases.AdicionarItem(pedidoId, request.ProdutoId, request.Quantidade));
+    public IActionResult AdicionarItem(int pedidoId, [FromBody] AddItemRequest request)
+    {
+        var dtoAtual = _useCases.BuscarPorId(pedidoId);
+
+        var block = BloquearSeNaoPodeAcessarPedido(dtoAtual);
+        if (block is not null)
+            return block;
+
+        var dto = _useCases.AdicionarItem(pedidoId, request.ProdutoId, request.Quantidade);
+        return Ok(dto);
+    }
 
     [HttpDelete("{pedidoId:int}/itens/{produtoId:int}")]
-    public ActionResult<PedidoDetalheDto> RemoverItem(int pedidoId, int produtoId) =>
-        Ok(_useCases.RemoverItem(pedidoId, produtoId));
+    public IActionResult RemoverItem(int pedidoId, int produtoId)
+    {
+        var dtoAtual = _useCases.BuscarPorId(pedidoId);
+
+        var block = BloquearSeNaoPodeAcessarPedido(dtoAtual);
+        if (block is not null)
+            return block;
+
+        var dto = _useCases.RemoverItem(pedidoId, produtoId);
+        return Ok(dto);
+    }
 
     [HttpPut("{pedidoId:int}/endereco")]
-    public ActionResult<PedidoDetalheDto> DefinirEndereco(
-        int pedidoId,
-        [FromBody] SetEnderecoRequest request
-    ) => Ok(_useCases.DefinirEnderecoEntrega(pedidoId, request.Endereco));
+    public IActionResult DefinirEndereco(int pedidoId, [FromBody] SetEnderecoRequest request)
+    {
+        var dtoAtual = _useCases.BuscarPorId(pedidoId);
 
-    [HttpPut("{pedidoId:int}/usar-endereco-padrao/{clienteId:int}")]
-    public ActionResult<PedidoDetalheDto> UsarEnderecoPadrao(int pedidoId, int clienteId) =>
-        Ok(_checkout.UsarEnderecoPadraoEntrega(pedidoId, clienteId));
+        var block = BloquearSeNaoPodeAcessarPedido(dtoAtual);
+        if (block is not null)
+            return block;
+
+        var dto = _useCases.DefinirEnderecoEntrega(pedidoId, request.Endereco);
+        return Ok(dto);
+    }
 
     [HttpPut("{pedidoId:int}/pagamento")]
-    public ActionResult<PedidoDetalheDto> DefinirPagamento(
-        int pedidoId,
-        [FromBody] SetPagamentoRequest request
-    ) => Ok(_useCases.DefinirFormaPagamento(pedidoId, request.FormaPagamento));
+    public IActionResult DefinirPagamento(int pedidoId, [FromBody] SetPagamentoRequest request)
+    {
+        var dtoAtual = _useCases.BuscarPorId(pedidoId);
+
+        var block = BloquearSeNaoPodeAcessarPedido(dtoAtual);
+        if (block is not null)
+            return block;
+
+        var dto = _useCases.DefinirFormaPagamento(pedidoId, request.FormaPagamento);
+        return Ok(dto);
+    }
 
     [HttpPut("{pedidoId:int}/cliente")]
-    public ActionResult<PedidoDetalheDto> IdentificarCliente(
+    public IActionResult IdentificarCliente(
         int pedidoId,
         [FromBody] IdentificarClienteRequest request
-    ) => Ok(_checkout.IdentificarClienteAutoSnapshot(pedidoId, request.ClienteId));
+    )
+    {
+        // Checkout: exige login
+        var blockLogin = UserGuard.BloquearSeNaoLogado(_auth);
+        if (blockLogin is not null)
+            return blockLogin;
+
+        //impede "assumir" outro cliente
+        if (_auth.UserRole != TechStore.Core.Entities.UserRole.Admin)
+        {
+            if (_auth.ClienteId is null)
+                return StatusCode(403, new { message = "Usuario nao possui cliente associado." });
+
+            if (_auth.ClienteId != request.ClienteId)
+                return StatusCode(
+                    403,
+                    new { message = "Acesso negado (clienteId nao pertence ao usuario logado)." }
+                );
+        }
+
+        //ainda valida acesso ao pedido antes de mexer
+        var dtoAtual = _useCases.BuscarPorId(pedidoId);
+        var block = BloquearSeNaoPodeAcessarPedido(dtoAtual);
+        if (block is not null)
+            return block;
+
+        var dto = _checkout.IdentificarClienteAutoSnapshot(pedidoId, request.ClienteId);
+        return Ok(dto);
+    }
+
+    [HttpPut("{pedidoId:int}/usar-endereco-padrao/{clienteId:int}")]
+    public IActionResult UsarEnderecoPadrao(int pedidoId, int clienteId)
+    {
+        // Checkout: exige login
+        var blockLogin = UserGuard.BloquearSeNaoLogado(_auth);
+        if (blockLogin is not null)
+            return blockLogin;
+
+        // Owner do cliente (ou admin)
+        var blockOwner = OwnershipGuard.BloquearSeNaoDonoOuAdmin(_auth, clienteId);
+        if (blockOwner is not null)
+            return blockOwner;
+
+        // e valida acesso ao pedido também
+        var dtoAtual = _useCases.BuscarPorId(pedidoId);
+        var blockPedido = BloquearSeNaoPodeAcessarPedido(dtoAtual);
+        if (blockPedido is not null)
+            return blockPedido;
+
+        var dto = _checkout.UsarEnderecoPadraoEntrega(pedidoId, clienteId);
+        return Ok(dto);
+    }
 
     [HttpPost("{pedidoId:int}/confirmar")]
-    public ActionResult<PedidoDetalheDto> Confirmar(int pedidoId) =>
-        Ok(_useCases.Confirmar(pedidoId));
+    public IActionResult Confirmar(int pedidoId)
+    {
+        // Checkout: exige login
+        var blockLogin = UserGuard.BloquearSeNaoLogado(_auth);
+        if (blockLogin is not null)
+            return blockLogin;
+
+        // valida acesso ao pedido (admin ou dono)
+        var dtoAtual = _useCases.BuscarPorId(pedidoId);
+        var block = BloquearSeNaoPodeAcessarPedido(dtoAtual);
+        if (block is not null)
+            return block;
+
+        return Ok(_useCases.Confirmar(pedidoId));
+    }
 
     [HttpPost("{pedidoId:int}/pagar")]
-    public ActionResult<PedidoDetalheDto> Pagar(int pedidoId) => Ok(_useCases.Pagar(pedidoId));
+    public IActionResult Pagar(int pedidoId)
+    {
+        // Checkout: exige login
+        var blockLogin = UserGuard.BloquearSeNaoLogado(_auth);
+        if (blockLogin is not null)
+            return blockLogin;
+
+        // valida acesso ao pedido (admin ou dono)
+        var dtoAtual = _useCases.BuscarPorId(pedidoId);
+        var block = BloquearSeNaoPodeAcessarPedido(dtoAtual);
+        if (block is not null)
+            return block;
+
+        return Ok(_useCases.Pagar(pedidoId));
+    }
 }

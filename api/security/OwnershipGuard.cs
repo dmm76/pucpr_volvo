@@ -34,4 +34,34 @@ public static class OwnershipGuard
 
         return null;
     }
+
+    public static IActionResult? BloquearSeNaoDonoAdminOuVisitante(
+        AuthState auth,
+        int? resourceClienteId,
+        Guid? resourceVisitorId,
+        Guid? requestVisitorId
+    )
+    {
+        // Admin passa sempre
+        if (auth.UserRole == UserRole.Admin)
+            return null;
+
+        // Cliente dono
+        if (auth.UserLogado)
+        {
+            if (auth.ClienteId == resourceClienteId)
+                return null;
+
+            return new ObjectResult(new { message = "Acesso negado (nao e o dono do recurso)." })
+            {
+                StatusCode = 403,
+            };
+        }
+
+        // Visitante dono
+        if (resourceVisitorId is not null && resourceVisitorId == requestVisitorId)
+            return null;
+
+        return new ObjectResult(new { message = "Acesso negado." }) { StatusCode = 403 };
+    }
 }
