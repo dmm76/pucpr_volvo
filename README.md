@@ -171,7 +171,7 @@ Isso torna a API muito mais previsível para quem consome.
 
 ## 🗄️ Modelo do Banco de Dados
 
-![Modelo do Banco](pucpr_volvo/blob/main/utils/images/tabelas.jpg)
+![Modelo do Banco](https://github.com/dmm76/pucpr_volvo/blob/main/utils/images/Tabelas.JPG)
 
 ### ✔️ Autenticação
 
