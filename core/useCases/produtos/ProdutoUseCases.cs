@@ -90,4 +90,12 @@ public class ProdutoUseCases
 
     public IReadOnlyList<ProdutoDto> BuscarTodos(int skip, int take) =>
         _repo.BuscarTodosPaginado(skip, take);
+
+    public IReadOnlyList<ProdutoDto> BuscarComFiltros(
+        string? nome,
+        decimal? precoMin,
+        decimal? precoMax,
+        int skip,
+        int take
+    ) => _repo.BuscarComFiltros(nome, precoMin, precoMax, skip, take);
 }

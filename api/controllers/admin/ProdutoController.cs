@@ -24,19 +24,30 @@ public class ProdutoController : ControllerBase
     public ActionResult<ProdutoDto> BuscarPorId(int id) => Ok(_useCases.BuscarPorId(id));
 
     [HttpGet]
-    public ActionResult<IReadOnlyList<ProdutoDto>> BuscarTodos(
-        [FromQuery] int skip = 0,
-        [FromQuery] int take = 10
-    )
+    public IActionResult BuscarTodos([FromQuery] BuscarProdutosQuery query)
     {
-        if (skip < 0)
-            skip = 0;
-        if (take <= 0)
-            take = 10;
+        var skip = query.Skip < 0 ? 0 : query.Skip;
+
+        var take = query.Take <= 0 ? 10 : query.Take;
         if (take > 100)
             take = 100;
 
-        return Ok(_useCases.BuscarTodos(skip, take));
+        if (
+            query.PrecoMin.HasValue
+            && query.PrecoMax.HasValue
+            && query.PrecoMin.Value > query.PrecoMax.Value
+        )
+            return BadRequest("precoMin não pode ser maior que precoMax.");
+
+        var itens = _useCases.BuscarComFiltros(
+            query.Nome,
+            query.PrecoMin,
+            query.PrecoMax,
+            skip,
+            take
+        );
+
+        return Ok(itens);
     }
 
     [HttpGet("categoria/{categoriaId:int}")]

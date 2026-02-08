@@ -53,9 +53,31 @@ public class ProdutoRepositorySql : IProdutoRepository
         _ctx.Produtos.AsNoTracking().Where(x => x.CategoriaId == categoriaId).ToList();
 
     public List<ProdutoDto> BuscarTodosPaginado(int skip, int take) =>
-        _ctx
-            .Produtos.AsNoTracking()
-            .OrderBy(p => p.Id)
+        BuscarComFiltros(nome: null, precoMin: null, precoMax: null, skip, take);
+
+    public List<ProdutoDto> BuscarComFiltros(
+        string? nome,
+        decimal? precoMin,
+        decimal? precoMax,
+        int skip,
+        int take
+    )
+    {
+        var q = _ctx.Produtos.AsNoTracking().AsQueryable();
+
+        if (!string.IsNullOrWhiteSpace(nome))
+        {
+            var n = nome.Trim();
+            q = q.Where(p => p.Nome != null && EF.Functions.Like(p.Nome, $"%{n}%"));
+        }
+
+        if (precoMin.HasValue)
+            q = q.Where(p => p.PrecoAtual >= precoMin.Value);
+
+        if (precoMax.HasValue)
+            q = q.Where(p => p.PrecoAtual <= precoMax.Value);
+
+        return q.OrderBy(p => p.Id)
             .Skip(skip)
             .Take(take)
             .Select(p => new ProdutoDto(
@@ -67,4 +89,5 @@ public class ProdutoRepositorySql : IProdutoRepository
                 p.CategoriaId
             ))
             .ToList();
+    }
 }

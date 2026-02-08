@@ -15,4 +15,12 @@ public interface IProdutoRepository
     bool NomeJaExiste(string nome);
     IReadOnlyList<Produto> BuscarPorCategoria(int categoriaId);
     List<ProdutoDto> BuscarTodosPaginado(int skip, int take);
+
+    List<ProdutoDto> BuscarComFiltros(
+        string? nome,
+        decimal? precoMin,
+        decimal? precoMax,
+        int skip,
+        int take
+    );
 }

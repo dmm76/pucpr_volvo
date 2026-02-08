@@ -88,4 +88,47 @@ public class ProdutoRepositoryFake : IProdutoRepository
             ))
             .ToList();
     }
+
+    public List<ProdutoDto> BuscarComFiltros(
+        string? nome,
+        decimal? precoMin,
+        decimal? precoMax,
+        int skip,
+        int take
+    )
+    {
+        if (skip < 0)
+            skip = 0;
+        if (take <= 0)
+            take = 10;
+        if (take > 100)
+            take = 100;
+
+        IEnumerable<Produto> q = _data;
+
+        if (!string.IsNullOrWhiteSpace(nome))
+        {
+            var n = nome.Trim();
+            q = q.Where(p => (p.Nome ?? "").Contains(n, StringComparison.OrdinalIgnoreCase));
+        }
+
+        if (precoMin.HasValue)
+            q = q.Where(p => p.PrecoAtual >= precoMin.Value);
+
+        if (precoMax.HasValue)
+            q = q.Where(p => p.PrecoAtual <= precoMax.Value);
+
+        return q.OrderBy(p => p.Id)
+            .Skip(skip)
+            .Take(take)
+            .Select(p => new ProdutoDto(
+                p.Id,
+                p.Nome ?? "",
+                p.Descricao,
+                p.PrecoAtual,
+                p.Estoque,
+                p.CategoriaId
+            ))
+            .ToList();
+    }
 }

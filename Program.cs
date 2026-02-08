@@ -8,6 +8,7 @@ using TechStore.Core.useCases.categorias;
 using TechStore.Core.UseCases.Clientes;
 using TechStore.Core.UseCases.Pedidos;
 using TechStore.Core.UseCases.Produtos;
+using TechStore.Core.UseCases.Relatorios;
 using TechStore.Infra.Context;
 using TechStore.Infra.Sql.Repositories;
 
@@ -35,6 +36,9 @@ builder.Services.AddScoped<ProdutoUseCases>();
 builder.Services.AddScoped<PedidoUseCases>();
 builder.Services.AddScoped<ClienteUseCases>();
 builder.Services.AddScoped<CheckoutUseCases>();
+
+builder.Services.AddScoped<IRelatorioRepository, RelatorioRepositorySql>();
+builder.Services.AddScoped<RelatorioUseCases>();
 
 var app = builder.Build();
 
