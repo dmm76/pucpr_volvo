@@ -119,6 +119,16 @@ public class Pedido
         if (string.IsNullOrWhiteSpace(customerNameSnapshot))
             throw new BusinessRuleException(ErrorCodes.OrderCustomerRequired);
 
+        // PREMIUM: ownership não pode trocar
+        if (ClienteId is not null)
+        {
+            // idempotente: mesmo cliente pode chamar de novo sem erro
+            if (ClienteId.Value == clienteId)
+                return;
+
+            throw new BusinessRuleException(ErrorCodes.OrderAlreadyOwned);
+        }
+
         ClienteId = clienteId;
         CustomerNameSnapshot = customerNameSnapshot.Trim();
         VisitorId = null;

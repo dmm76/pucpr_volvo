@@ -57,6 +57,8 @@ public static class ErrorCodes
     public const string OrderShippingAddressRequired = "ORDER_SHIPPING_ADDRESS_REQUIRED";
     public const string OrderPaymentMethodRequired = "ORDER_PAYMENT_METHOD_REQUIRED";
 
+    public const string OrderAlreadyOwned = "ORDER_ALREADY_OWNED";
+
     // ORDER ITEM (ItemPedido)
     public const string OrderItemProductRequired = "ORDER_ITEM_PRODUCT_REQUIRED";
     public const string OrderItemQuantityInvalid = "ORDER_ITEM_QUANTITY_INVALID";

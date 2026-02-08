@@ -65,6 +65,8 @@ public static class ErrorMessagesPtBr
             ErrorCodes.OrderPaymentMethodRequired =>
                 "Forma de pagamento e obrigatoria para confirmar o pedido.",
 
+            ErrorCodes.OrderAlreadyOwned => "Pedido já possui um dono e não pode ser transferido.",
+
             // ORDER ITEM
             ErrorCodes.OrderItemProductRequired => "Produto do item e obrigatorio.",
             ErrorCodes.OrderItemQuantityInvalid => "Quantidade do item invalida.",
