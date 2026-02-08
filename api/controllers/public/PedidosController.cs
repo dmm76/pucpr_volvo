@@ -24,39 +24,65 @@ public class PedidosController : ControllerBase
         _checkout = checkout;
     }
 
+    // =========================================
+    // Helpers
+    // =========================================
+    private static Guid? ParseGuidOrNull(string? value) =>
+        Guid.TryParse(value, out var g) ? g : null;
+
     private Guid? GetVisitorIdFromHeader()
     {
         Request.Headers.TryGetValue(VisitorHeaderName, out var header);
-        return Guid.TryParse(header, out var parsed) ? parsed : null;
+        return ParseGuidOrNull(header);
     }
 
+    // Versão "normal": usa header do request (continua funcionando fora do Swagger)
     private IActionResult? BloquearSeNaoPodeAcessarPedido(PedidoDetalheDto dto)
     {
         var visitorId = GetVisitorIdFromHeader();
-
-        // ALTERADO: usa PedidoGuard centralizado em vez de OwnershipGuard
         return PedidoGuard.BloquearSeNaoPodeAcessar(_auth, dto.ClienteId, dto.VisitorId, visitorId);
     }
 
-    [HttpPost]
-    public ActionResult<PedidoDetalheDto> CriarCarrinho()
+    // Versão "Swagger-friendly": recebe visitorId explicitamente (aparece no Swagger)
+    private IActionResult? BloquearSeNaoPodeAcessarPedido(PedidoDetalheDto dto, Guid? visitorId)
     {
-        var visitorId = GetVisitorIdFromHeader();
+        // se não veio por parâmetro, cai no header (não quebra chamadas antigas)
+        visitorId ??= GetVisitorIdFromHeader();
+
+        return PedidoGuard.BloquearSeNaoPodeAcessar(_auth, dto.ClienteId, dto.VisitorId, visitorId);
+    }
+
+    // =========================================
+    // Endpoints
+    // =========================================
+
+    [HttpPost]
+    public ActionResult<PedidoDetalheDto> CriarCarrinho(
+        // só para o Swagger permitir que você "continue" um visitorId existente se quiser
+        [FromHeader(Name = VisitorHeaderName)] Guid? visitorId = null
+    )
+    {
+        // prioridade: parâmetro (Swagger) -> header real
+        visitorId ??= GetVisitorIdFromHeader();
 
         var dto = _useCases.CriarCarrinho(visitorId);
 
         // devolve o "ticket" do carrinho para o cliente reutilizar nas próximas chamadas
-        Response.Headers[VisitorHeaderName] = dto.VisitorId!.ToString();
+        if (dto.VisitorId is not null)
+            Response.Headers[VisitorHeaderName] = dto.VisitorId.Value.ToString();
 
         return Ok(dto);
     }
 
     [HttpGet("{pedidoId:int}")]
-    public IActionResult BuscarPorId(int pedidoId)
+    public IActionResult BuscarPorId(
+        int pedidoId,
+        [FromHeader(Name = VisitorHeaderName)] Guid? visitorId = null
+    )
     {
         var dto = _useCases.BuscarPorId(pedidoId);
 
-        var block = BloquearSeNaoPodeAcessarPedido(dto);
+        var block = BloquearSeNaoPodeAcessarPedido(dto, visitorId);
         if (block is not null)
             return block;
 
@@ -66,12 +92,10 @@ public class PedidosController : ControllerBase
     [HttpGet("cliente/{clienteId:int}")]
     public IActionResult BuscarPorCliente(int clienteId)
     {
-        // ALTERADO: login e ownership via PedidoGuard
         var blockLogin = PedidoGuard.BloquearCheckoutSeNaoLogado(_auth);
         if (blockLogin is not null)
             return blockLogin;
 
-        // ALTERADO: validação de cliente via PedidoGuard
         var blockOwner = PedidoGuard.BloquearSeNaoPodeAssumirCliente(_auth, clienteId);
         if (blockOwner is not null)
             return blockOwner;
@@ -81,11 +105,15 @@ public class PedidosController : ControllerBase
     }
 
     [HttpPost("{pedidoId:int}/itens")]
-    public IActionResult AdicionarItem(int pedidoId, [FromBody] AddItemRequest request)
+    public IActionResult AdicionarItem(
+        int pedidoId,
+        [FromBody] AddItemRequest request,
+        [FromHeader(Name = VisitorHeaderName)] Guid? visitorId = null
+    )
     {
         var dtoAtual = _useCases.BuscarPorId(pedidoId);
 
-        var block = BloquearSeNaoPodeAcessarPedido(dtoAtual);
+        var block = BloquearSeNaoPodeAcessarPedido(dtoAtual, visitorId);
         if (block is not null)
             return block;
 
@@ -94,11 +122,15 @@ public class PedidosController : ControllerBase
     }
 
     [HttpDelete("{pedidoId:int}/itens/{produtoId:int}")]
-    public IActionResult RemoverItem(int pedidoId, int produtoId)
+    public IActionResult RemoverItem(
+        int pedidoId,
+        int produtoId,
+        [FromHeader(Name = VisitorHeaderName)] Guid? visitorId = null
+    )
     {
         var dtoAtual = _useCases.BuscarPorId(pedidoId);
 
-        var block = BloquearSeNaoPodeAcessarPedido(dtoAtual);
+        var block = BloquearSeNaoPodeAcessarPedido(dtoAtual, visitorId);
         if (block is not null)
             return block;
 
@@ -107,11 +139,15 @@ public class PedidosController : ControllerBase
     }
 
     [HttpPut("{pedidoId:int}/endereco")]
-    public IActionResult DefinirEndereco(int pedidoId, [FromBody] SetEnderecoRequest request)
+    public IActionResult DefinirEndereco(
+        int pedidoId,
+        [FromBody] SetEnderecoRequest request,
+        [FromHeader(Name = VisitorHeaderName)] Guid? visitorId = null
+    )
     {
         var dtoAtual = _useCases.BuscarPorId(pedidoId);
 
-        var block = BloquearSeNaoPodeAcessarPedido(dtoAtual);
+        var block = BloquearSeNaoPodeAcessarPedido(dtoAtual, visitorId);
         if (block is not null)
             return block;
 
@@ -120,11 +156,15 @@ public class PedidosController : ControllerBase
     }
 
     [HttpPut("{pedidoId:int}/pagamento")]
-    public IActionResult DefinirPagamento(int pedidoId, [FromBody] SetPagamentoRequest request)
+    public IActionResult DefinirPagamento(
+        int pedidoId,
+        [FromBody] SetPagamentoRequest request,
+        [FromHeader(Name = VisitorHeaderName)] Guid? visitorId = null
+    )
     {
         var dtoAtual = _useCases.BuscarPorId(pedidoId);
 
-        var block = BloquearSeNaoPodeAcessarPedido(dtoAtual);
+        var block = BloquearSeNaoPodeAcessarPedido(dtoAtual, visitorId);
         if (block is not null)
             return block;
 
@@ -138,17 +178,15 @@ public class PedidosController : ControllerBase
         [FromBody] IdentificarClienteRequest request
     )
     {
-        // ALTERADO: login via PedidoGuard
         var blockLogin = PedidoGuard.BloquearCheckoutSeNaoLogado(_auth);
         if (blockLogin is not null)
             return blockLogin;
 
-        // ALTERADO: impede "assumir" outro cliente via PedidoGuard
         var blockCliente = PedidoGuard.BloquearSeNaoPodeAssumirCliente(_auth, request.ClienteId);
         if (blockCliente is not null)
             return blockCliente;
 
-        //ainda valida acesso ao pedido antes de mexer
+        // valida acesso ao pedido antes de mexer
         var dtoAtual = _useCases.BuscarPorId(pedidoId);
         if (dtoAtual.ClienteId is not null)
         {
@@ -164,18 +202,16 @@ public class PedidosController : ControllerBase
     [HttpPut("{pedidoId:int}/usar-endereco-padrao/{clienteId:int}")]
     public IActionResult UsarEnderecoPadrao(int pedidoId, int clienteId)
     {
-        // ALTERADO: login via PedidoGuard
         var blockLogin = PedidoGuard.BloquearCheckoutSeNaoLogado(_auth);
         if (blockLogin is not null)
             return blockLogin;
 
-        // ALTERADO: owner do cliente via PedidoGuard
         var blockOwner = PedidoGuard.BloquearSeNaoPodeAssumirCliente(_auth, clienteId);
         if (blockOwner is not null)
             return blockOwner;
 
-        // e valida acesso ao pedido também
         var dtoAtual = _useCases.BuscarPorId(pedidoId);
+
         var blockPedido = BloquearSeNaoPodeAcessarPedido(dtoAtual);
         if (blockPedido is not null)
             return blockPedido;
@@ -185,16 +221,18 @@ public class PedidosController : ControllerBase
     }
 
     [HttpPost("{pedidoId:int}/confirmar")]
-    public IActionResult Confirmar(int pedidoId)
+    public IActionResult Confirmar(
+        int pedidoId,
+        [FromHeader(Name = VisitorHeaderName)] Guid? visitorId = null
+    )
     {
-        // ALTERADO: login via PedidoGuard
         var blockLogin = PedidoGuard.BloquearCheckoutSeNaoLogado(_auth);
         if (blockLogin is not null)
             return blockLogin;
 
-        // valida acesso ao pedido (admin ou dono)
         var dtoAtual = _useCases.BuscarPorId(pedidoId);
-        var block = BloquearSeNaoPodeAcessarPedido(dtoAtual);
+
+        var block = BloquearSeNaoPodeAcessarPedido(dtoAtual, visitorId);
         if (block is not null)
             return block;
 
@@ -202,16 +240,18 @@ public class PedidosController : ControllerBase
     }
 
     [HttpPost("{pedidoId:int}/pagar")]
-    public IActionResult Pagar(int pedidoId)
+    public IActionResult Pagar(
+        int pedidoId,
+        [FromHeader(Name = VisitorHeaderName)] Guid? visitorId = null
+    )
     {
-        // ALTERADO: login via PedidoGuard
         var blockLogin = PedidoGuard.BloquearCheckoutSeNaoLogado(_auth);
         if (blockLogin is not null)
             return blockLogin;
 
-        // valida acesso ao pedido (admin ou dono)
         var dtoAtual = _useCases.BuscarPorId(pedidoId);
-        var block = BloquearSeNaoPodeAcessarPedido(dtoAtual);
+
+        var block = BloquearSeNaoPodeAcessarPedido(dtoAtual, visitorId);
         if (block is not null)
             return block;
 
