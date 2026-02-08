@@ -1,6 +1,6 @@
 using TechStore.Core.Enums;
 
-namespace TechStore.Api.Dtos;
+namespace TechStore.Api.Dtos.Pedidos;
 
 public record AddItemRequest(int ProdutoId, int Quantidade);
 

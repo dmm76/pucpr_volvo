@@ -76,6 +76,41 @@ public class Endereco
         IsDefaultBilling = isDefaultBilling;
     }
 
+    //construtor parcial para fazer a divisao do cadatro em controllers
+    public Endereco(
+        int clienteId,
+        string descricao,
+        string telefone,
+        string cep,
+        string logradouro,
+        int numero,
+        string complemento,
+        string bairro,
+        string cidade,
+        string estado,
+        string pais,
+        bool isDefaultShipping,
+        bool isDefaultBilling
+    )
+        : this(
+            clienteId,
+            descricao,
+            telefone,
+            cep,
+            codIbge: 0,
+            latitude: 0,
+            longitude: 0,
+            logradouro,
+            numero,
+            complemento,
+            bairro,
+            cidade,
+            estado,
+            pais,
+            isDefaultShipping,
+            isDefaultBilling
+        ) { }
+
     public void DefinirDefaultShipping(bool valor)
     {
         IsDefaultShipping = valor;

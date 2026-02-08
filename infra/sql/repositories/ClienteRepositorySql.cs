@@ -17,7 +17,8 @@ public class ClienteRepositorySql : IClienteRepository
     public Cliente? BuscarPorUserId(int userId) =>
         _ctx.Clientes.Include(c => c.Enderecos).FirstOrDefault(c => c.UserId == userId);
 
-    public List<Cliente> BuscarTodos() => _ctx.Clientes.AsNoTracking().ToList();
+    public List<Cliente> BuscarTodos() =>
+        _ctx.Clientes.AsNoTracking().Include(c => c.Enderecos).ToList();
 
     public Cliente Inserir(Cliente cliente)
     {

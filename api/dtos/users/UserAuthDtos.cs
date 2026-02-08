@@ -1,4 +1,4 @@
-namespace TechStore.Api.Dtos;
+namespace TechStore.Api.Dtos.Users;
 
 public record UserLoginRequest(string Login, string Senha);
 

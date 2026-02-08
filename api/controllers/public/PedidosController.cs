@@ -1,6 +1,6 @@
 using Microsoft.AspNetCore.Mvc;
 using TechStore.Api.Auth;
-using TechStore.Api.Dtos;
+using TechStore.Api.Dtos.Pedidos;
 using TechStore.Api.Security;
 using TechStore.Core.Dtos;
 using TechStore.Core.UseCases.Pedidos;

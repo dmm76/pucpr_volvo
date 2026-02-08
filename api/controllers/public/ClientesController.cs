@@ -1,9 +1,9 @@
 using Microsoft.AspNetCore.Mvc;
 using TechStore.Api.Auth;
-using TechStore.Api.Dtos;
+using TechStore.Api.Dtos.Clientes;
+using TechStore.Api.Mappers;
 using TechStore.Api.Security;
 using TechStore.Core.Dtos;
-using TechStore.Core.Entities;
 using TechStore.Core.UseCases.Clientes;
 
 namespace TechStore.Api.Controllers.Public;
@@ -24,30 +24,10 @@ public class ClientesController : ControllerBase
     [HttpPost]
     public ActionResult<ClienteDetalheDto> Cadastrar([FromBody] CadastrarClienteRequest req)
     {
-        Endereco? endereco = null;
+        if (req is null)
+            return BadRequest(new { message = "Body é obrigatório." });
 
-        if (req.Endereco is not null)
-        {
-            endereco = new Endereco(
-                clienteId: 0,
-                descricao: req.Endereco.Descricao,
-                telefone: req.Endereco.Telefone,
-                cep: req.Endereco.Cep,
-                codIbge: req.Endereco.CodIbge,
-                latitude: req.Endereco.Latitude,
-                longitude: req.Endereco.Longitude,
-                logradouro: req.Endereco.Logradouro,
-                numero: req.Endereco.Numero,
-                complemento: req.Endereco.Complemento,
-                bairro: req.Endereco.Bairro,
-                cidade: req.Endereco.Cidade,
-                estado: req.Endereco.Estado,
-                pais: req.Endereco.Pais,
-                isDefaultShipping: req.Endereco.IsDefaultShipping,
-                isDefaultBilling: req.Endereco.IsDefaultBilling
-            );
-        }
-
+        // ainda compatível com UseCase atual (que recebe Endereco?):
         var dto = _useCases.Cadastrar(
             nome: req.Nome,
             telefone: req.Telefone,
@@ -55,7 +35,7 @@ public class ClientesController : ControllerBase
             login: req.Login,
             senha: req.Senha,
             documentoIdentidade: req.DocumentoIdentidade,
-            enderecoOpcional: endereco
+            enderecoOpcional: null
         );
 
         return CreatedAtAction(nameof(BuscarPorId), new { clienteId = dto.Id }, dto);
@@ -79,5 +59,42 @@ public class ClientesController : ControllerBase
             return block;
 
         return Ok(_useCases.BuscarPorId(clienteId));
+    }
+
+    [HttpGet("me")]
+    public IActionResult Me()
+    {
+        var block = UserGuard.BloquearSeNaoLogado(_auth);
+        if (block is not null)
+            return block;
+
+        if (_auth.ClienteId is null)
+            return new ObjectResult(new { message = "Usuario nao possui cliente associado." })
+            {
+                StatusCode = 403,
+            };
+
+        return Ok(_useCases.BuscarPorId(_auth.ClienteId.Value));
+    }
+
+    [HttpPost("me/enderecos")]
+    public IActionResult AdicionarEndereco([FromBody] CriarEnderecoRequest req)
+    {
+        var block = UserGuard.BloquearSeNaoLogado(_auth);
+        if (block is not null)
+            return block;
+
+        if (_auth.UserId is null)
+            return new ObjectResult(new { message = "Usuario logado invalido." })
+            {
+                StatusCode = 403,
+            };
+
+        if (req is null)
+            return BadRequest(new { message = "Body é obrigatório." });
+
+        var dto = _useCases.AdicionarEnderecoMe(userId: _auth.UserId.Value, req: req.ToCore());
+
+        return Ok(dto);
     }
 }

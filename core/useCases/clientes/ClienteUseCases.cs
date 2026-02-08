@@ -101,6 +101,39 @@ public class ClienteUseCases
             .ToList();
     }
 
+    public ClienteDetalheDto AdicionarEnderecoMe(int userId, CriarEnderecoDto req)
+    {
+        var cliente =
+            _clienteRepo.BuscarPorUserId(userId)
+            ?? throw new NotFoundException(ErrorCodes.ClienteNotFound);
+
+        var user =
+            _userRepo.BuscarPorId(cliente.UserId)
+            ?? throw new NotFoundException(ErrorCodes.InternalServerError);
+
+        var endereco = new Endereco(
+            clienteId: cliente.Id,
+            descricao: req.Descricao,
+            telefone: req.Telefone,
+            cep: req.Cep,
+            logradouro: req.Logradouro,
+            numero: req.Numero,
+            complemento: req.Complemento ?? "",
+            bairro: req.Bairro,
+            cidade: req.Cidade,
+            estado: req.Estado,
+            pais: req.Pais,
+            isDefaultShipping: req.IsDefaultShipping,
+            isDefaultBilling: req.IsDefaultBilling
+        );
+
+        cliente.AdicionarEndereco(endereco);
+
+        _clienteRepo.Atualizar(cliente);
+
+        return Map(cliente, user, senhaTemporaria: null);
+    }
+
     private static ClienteDetalheDto Map(Cliente c, User u, string? senhaTemporaria) =>
         new(
             c.Id,

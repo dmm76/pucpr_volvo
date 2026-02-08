@@ -1,5 +1,6 @@
 using Microsoft.AspNetCore.Mvc;
 using TechStore.Api.Auth;
+using TechStore.Api.Dtos.Categoria;
 using TechStore.Api.Security;
 using TechStore.Core.useCases.categorias;
 
@@ -35,11 +36,9 @@ public class CategoriasController : ControllerBase
         if (bloqueio is not null)
             return bloqueio;
 
-        var dto = _service.BuscarPorId(id); // se não existir: NotFoundException
+        var dto = _service.BuscarPorId(id);
         return Ok(dto);
     }
-
-    public record CriarCategoriaRequest(string Nome);
 
     [HttpPost]
     public IActionResult Create([FromBody] CriarCategoriaRequest request)
@@ -51,7 +50,32 @@ public class CategoriasController : ControllerBase
         if (request is null)
             return BadRequest(new { message = "Body é obrigatório." });
 
-        var dto = _service.Criar(request.Nome);
+        var dto = _service.Criar(request.Nome, request.Descricao);
         return CreatedAtAction(nameof(GetById), new { id = dto.Id }, dto);
+    }
+
+    [HttpPut("{id:int}")]
+    public IActionResult Update(int id, [FromBody] AtualizarCategoriaRequest request)
+    {
+        var bloqueio = AdminGuard.BloquearSeNaoLogado(_auth);
+        if (bloqueio is not null)
+            return bloqueio;
+
+        if (request is null)
+            return BadRequest(new { message = "Body é obrigatório." });
+
+        var dto = _service.Atualizar(id, request.Nome, request.Descricao);
+        return Ok(dto);
+    }
+
+    [HttpDelete("{id:int}")]
+    public IActionResult Delete(int id)
+    {
+        var bloqueio = AdminGuard.BloquearSeNaoLogado(_auth);
+        if (bloqueio is not null)
+            return bloqueio;
+
+        _service.Remover(id);
+        return NoContent();
     }
 }

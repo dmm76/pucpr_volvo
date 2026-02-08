@@ -1,4 +1,4 @@
-namespace TechStore.Api.Dtos;
+namespace TechStore.Api.Dtos.Produtos;
 
 // Requests (entrada)
 public record CriarProdutoRequest(

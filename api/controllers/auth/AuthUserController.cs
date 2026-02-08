@@ -1,6 +1,6 @@
 using Microsoft.AspNetCore.Mvc;
 using TechStore.Api.Auth;
-using TechStore.Api.Dtos;
+using TechStore.Api.Dtos.Users;
 using TechStore.Core.Interfaces;
 
 namespace TechStore.Api.Controllers.Auth;
