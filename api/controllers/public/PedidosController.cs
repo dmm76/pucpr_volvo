@@ -34,12 +34,8 @@ public class PedidosController : ControllerBase
     {
         var visitorId = GetVisitorIdFromHeader();
 
-        return OwnershipGuard.BloquearSeNaoDonoAdminOuVisitante(
-            _auth,
-            dto.ClienteId,
-            dto.VisitorId,
-            visitorId
-        );
+        // ALTERADO: usa PedidoGuard centralizado em vez de OwnershipGuard
+        return PedidoGuard.BloquearSeNaoPodeAcessar(_auth, dto.ClienteId, dto.VisitorId, visitorId);
     }
 
     [HttpPost]
@@ -70,9 +66,15 @@ public class PedidosController : ControllerBase
     [HttpGet("cliente/{clienteId:int}")]
     public IActionResult BuscarPorCliente(int clienteId)
     {
-        var block = OwnershipGuard.BloquearSeNaoDonoOuAdmin(_auth, clienteId);
-        if (block is not null)
-            return block;
+        // ALTERADO: login e ownership via PedidoGuard
+        var blockLogin = PedidoGuard.BloquearCheckoutSeNaoLogado(_auth);
+        if (blockLogin is not null)
+            return blockLogin;
+
+        // ALTERADO: validação de cliente via PedidoGuard
+        var blockOwner = PedidoGuard.BloquearSeNaoPodeAssumirCliente(_auth, clienteId);
+        if (blockOwner is not null)
+            return blockOwner;
 
         var lista = _useCases.BuscarPorCliente(clienteId);
         return Ok(lista);
@@ -136,23 +138,15 @@ public class PedidosController : ControllerBase
         [FromBody] IdentificarClienteRequest request
     )
     {
-        // Checkout: exige login
-        var blockLogin = UserGuard.BloquearSeNaoLogado(_auth);
+        // ALTERADO: login via PedidoGuard
+        var blockLogin = PedidoGuard.BloquearCheckoutSeNaoLogado(_auth);
         if (blockLogin is not null)
             return blockLogin;
 
-        //impede "assumir" outro cliente
-        if (_auth.UserRole != TechStore.Core.Entities.UserRole.Admin)
-        {
-            if (_auth.ClienteId is null)
-                return StatusCode(403, new { message = "Usuario nao possui cliente associado." });
-
-            if (_auth.ClienteId != request.ClienteId)
-                return StatusCode(
-                    403,
-                    new { message = "Acesso negado (clienteId nao pertence ao usuario logado)." }
-                );
-        }
+        // ALTERADO: impede "assumir" outro cliente via PedidoGuard
+        var blockCliente = PedidoGuard.BloquearSeNaoPodeAssumirCliente(_auth, request.ClienteId);
+        if (blockCliente is not null)
+            return blockCliente;
 
         //ainda valida acesso ao pedido antes de mexer
         var dtoAtual = _useCases.BuscarPorId(pedidoId);
@@ -170,13 +164,13 @@ public class PedidosController : ControllerBase
     [HttpPut("{pedidoId:int}/usar-endereco-padrao/{clienteId:int}")]
     public IActionResult UsarEnderecoPadrao(int pedidoId, int clienteId)
     {
-        // Checkout: exige login
-        var blockLogin = UserGuard.BloquearSeNaoLogado(_auth);
+        // ALTERADO: login via PedidoGuard
+        var blockLogin = PedidoGuard.BloquearCheckoutSeNaoLogado(_auth);
         if (blockLogin is not null)
             return blockLogin;
 
-        // Owner do cliente (ou admin)
-        var blockOwner = OwnershipGuard.BloquearSeNaoDonoOuAdmin(_auth, clienteId);
+        // ALTERADO: owner do cliente via PedidoGuard
+        var blockOwner = PedidoGuard.BloquearSeNaoPodeAssumirCliente(_auth, clienteId);
         if (blockOwner is not null)
             return blockOwner;
 
@@ -193,8 +187,8 @@ public class PedidosController : ControllerBase
     [HttpPost("{pedidoId:int}/confirmar")]
     public IActionResult Confirmar(int pedidoId)
     {
-        // Checkout: exige login
-        var blockLogin = UserGuard.BloquearSeNaoLogado(_auth);
+        // ALTERADO: login via PedidoGuard
+        var blockLogin = PedidoGuard.BloquearCheckoutSeNaoLogado(_auth);
         if (blockLogin is not null)
             return blockLogin;
 
@@ -210,8 +204,8 @@ public class PedidosController : ControllerBase
     [HttpPost("{pedidoId:int}/pagar")]
     public IActionResult Pagar(int pedidoId)
     {
-        // Checkout: exige login
-        var blockLogin = UserGuard.BloquearSeNaoLogado(_auth);
+        // ALTERADO: login via PedidoGuard
+        var blockLogin = PedidoGuard.BloquearCheckoutSeNaoLogado(_auth);
         if (blockLogin is not null)
             return blockLogin;
 
