@@ -1,29 +1,30 @@
 
-# 📌 Dívida Técnica — Segurança e Autorização (Ownership + Roles)
+# 📌 Dívida Técnica — Segurança, Autorização e Autenticação
 
 ## Contexto
 
 O projeto **TechStore API** já demonstra uma arquitetura sólida com:
 
-- Domínio rico
-- UseCases bem definidos
-- Middleware global
-- ErrorCodes padronizados
-- Snapshots no pedido
-- Separação clara de responsabilidades
+- Domínio rico  
+- UseCases bem definidos  
+- Middleware global  
+- ErrorCodes padronizados  
+- Snapshots no pedido  
+- Separação clara de responsabilidades  
 
-Com a base estrutural estável, o próximo passo natural de maturidade arquitetural é **fortalecer a segurança da aplicação**, implementando regras de autorização mais próximas de sistemas reais.
+Com a base estrutural estável, o próximo passo natural de maturidade arquitetural é **fortalecer a segurança da aplicação**, implementando regras de autorização mais próximas de sistemas reais e evoluindo o modelo de autenticação.
 
 ---
 
 # 🎯 Objetivo da Implementação
 
-Evoluir o modelo atual de autenticação para incluir:
+Evoluir o modelo atual para incluir:
 
 ✅ Autorização por papel (Role-Based Authorization)  
 ✅ Autorização por propriedade do recurso (**Ownership**)  
 ✅ Proteção contra vazamento de dados  
-✅ Preparação arquitetural para JWT no futuro  
+✅ Autenticação stateless no futuro (JWT)  
+✅ Estrutura preparada para múltiplos usuários simultâneos  
 
 ---
 
@@ -34,57 +35,116 @@ Hoje o sistema possui:
 ### ✔ AdminGuard
 Protege endpoints administrativos como cadastro de categoria.
 
+### ✔ EF Core com persistência real
+A aplicação já opera com banco relacional e migrations, garantindo integridade dos dados.
+
 ### ❗ Problema Atual
 Grande parte dos endpoints ainda está **aberta para qualquer usuário**, o que permitiria, por exemplo:
 
-- Um cliente visualizar pedidos de outro cliente
-- Acesso irrestrito a dados sensíveis
-- Falta de separação clara entre usuário comum e administrador
+- Um cliente visualizar pedidos de outro cliente  
+- Acesso irrestrito a dados sensíveis  
+- Falta de separação clara entre usuário comum e administrador  
 
-Isso não é um erro de arquitetura — apenas um passo ainda não implementado.
+Isso não representa falha arquitetural — apenas uma evolução ainda não implementada.
 
 ---
 
-# 🧠 Decisão Arquitetural
+# 🔐 Autenticação Atual — AuthState Singleton
 
-Adotar dois pilares de segurança:
+## Situação
+
+O projeto utiliza atualmente:
+
+```csharp
+builder.Services.AddSingleton<AuthState>();
+```
+
+Essa decisão foi **intencional**, adotada para:
+
+- Simplificar testes via Swagger  
+- Permitir demonstrações rápidas  
+- Focar na validação do domínio e da persistência  
+- Evitar complexidade prematura  
+
+## ⚠️ Limitações Conhecidas
+
+Essa abordagem **não deve ser usada em produção**, pois:
+
+- O estado de login é global no servidor  
+- Não há isolamento entre usuários  
+- Pode ocorrer vazamento de sessão  
+- Não escala horizontalmente  
+- Reiniciar a API derruba todas as sessões  
+
+## 🧠 Decisão Arquitetural
+
+Esta é uma **dívida técnica planejada**, não um erro.
+
+Foi escolhida conscientemente para priorizar:
+
+✔ Modelagem correta do domínio  
+✔ Persistência confiável com EF Core  
+✔ Estrutura arquitetural limpa  
+✔ Evolução incremental do sistema  
+
+> **Comece simples. Proteja o que é crítico.**
+
+## 🚀 Evolução Planejada
+
+Migrar para autenticação **stateless**, utilizando JWT.
+
+### Etapas futuras:
+
+1. Implementar geração de JWT no endpoint de login  
+2. Adicionar middleware `UseAuthentication()`  
+3. Popular `HttpContext.User`  
+4. Criar policies (Admin / Owner)  
+5. Remover completamente o `AuthState`  
+6. (Opcional) Implementar Refresh Token  
+
+---
+
+# 🧠 Decisão Arquitetural de Segurança
+
+Adotar dois pilares principais:
 
 ## 1️⃣ Role-Based Authorization
+
 Controle baseado no papel do usuário.
 
 ### Admin deve poder:
-- CRUD de produtos
-- CRUD de categorias
-- Visualizar todos os pedidos
-- Visualizar todos os clientes
+- CRUD de produtos  
+- CRUD de categorias  
+- Visualizar todos os pedidos  
+- Visualizar todos os clientes  
 
 ### Usuário comum deve poder:
-- Visualizar apenas seus próprios pedidos
-- Operar somente seu carrinho
-- Acessar apenas seu cadastro
+- Visualizar apenas seus próprios pedidos  
+- Operar somente seu carrinho  
+- Acessar apenas seu cadastro  
 
 ---
 
 ## 2️⃣ Ownership (Autorização por propriedade)
 
-Este é o salto de maturidade.
+O salto de maturidade do backend.
 
 A regra central passa a ser:
 
-> **O recurso pertence a este usuário?**
+> **O recurso pertence a este usuário?**  
+> Se não pertence → acesso negado.
 
-Se não pertence → acesso negado.
-
-### Exemplos críticos:
+### Exemplos críticos
 
 #### Pedidos
-- Usuário só pode acessar pedidos onde:
+Usuário só pode acessar pedidos onde:
+
 ```
 pedido.ClienteId == clienteIdDoUsuarioAtual
 ```
 
 #### Clientes
-- Usuário só pode visualizar o próprio registro.
+Usuário só pode visualizar o próprio registro.
 
 ---
 
@@ -96,8 +156,8 @@ Semelhante ao AdminGuard.
 
 Responsável por garantir:
 
-- Usuário autenticado
-- Bloqueio com 401 quando necessário
+- Usuário autenticado  
+- Bloqueio com 401 quando necessário  
 
 ---
 
@@ -129,14 +189,14 @@ Esse método será a base do ownership.
 ## 🔴 Alta prioridade
 
 ### Pedidos
-- GET /api/pedidos/{id}
-- GET /api/pedidos/cliente/{clienteId}
-- POST /itens
-- PUT cliente
-- PUT endereço
-- PUT pagamento
-- POST confirmar
-- POST pagar
+- GET /api/pedidos/{id}  
+- GET /api/pedidos/cliente/{clienteId}  
+- POST /itens  
+- PUT cliente  
+- PUT endereço  
+- PUT pagamento  
+- POST confirmar  
+- POST pagar  
 
 👉 Somente o dono do carrinho deve operar.
 
@@ -145,18 +205,18 @@ Esse método será a base do ownership.
 ## 🟡 Média prioridade
 
 ### Clientes
-- GET /api/clientes → Admin only
-- GET /api/clientes/{id}
-    - Admin: pode
-    - Usuário: apenas o próprio
+- GET /api/clientes → Admin only  
+- GET /api/clientes/{id}  
+    - Admin: pode  
+    - Usuário: apenas o próprio  
 
 ---
 
 ## 🟢 Baixa prioridade (podem permanecer públicos)
 
-- GET produtos
-- GET categorias
-- Criar carrinho (opcional — muitos ecommerces permitem modo visitante)
+- GET produtos  
+- GET categorias  
+- Criar carrinho (modo visitante — comum em ecommerces)  
 
 ---
 
@@ -166,22 +226,22 @@ Para elevar o nível profissional da API:
 
 ### Rotas Públicas
 ```
-/api/produtos
-/api/categorias
-/api/pedidos (criar carrinho)
+/api/produtos  
+/api/categorias  
+/api/pedidos (criar carrinho)  
 ```
 
 ### Rotas do Usuário
 ```
-/api/pedidos/{id}
-/api/pedidos/cliente/{clienteId}
+/api/pedidos/{id}  
+/api/pedidos/cliente/{clienteId}  
 ```
 
 ### Rotas Admin
 ```
-/api/admin/produtos
-/api/admin/categorias
-/api/admin/pedidos
+/api/admin/produtos  
+/api/admin/categorias  
+/api/admin/pedidos  
 ```
 
 Separar rotas melhora:
@@ -189,25 +249,6 @@ Separar rotas melhora:
 ✅ Clareza  
 ✅ Segurança  
 ✅ Organização mental do sistema  
-
----
-
-# ⚠️ Observação Importante
-
-O projeto utiliza atualmente:
-
-## AuthState Singleton
-
-Isso é **aceitável para demonstração**, mas representa uma dívida técnica planejada.
-
-### Evolução futura:
-- JWT
-- Autenticação stateless
-- Refresh tokens
-
-👉 Nenhuma mudança necessária agora.
-
-Evitar complexidade prematura é uma decisão arquitetural madura.
 
 ---
 
@@ -229,11 +270,11 @@ Este é um dos maiores saltos de maturidade de um backend.
 
 ## 🔥 ALTA
 
-Recomenda-se implementar **antes da migração para EF Core**, pois:
+Recomenda-se implementar **antes da evolução para autenticação JWT**, garantindo que:
 
-- Evita refatorações futuras
-- Mantém o domínio protegido
-- Garante que persistência já nasça segura
+- O domínio já nasça protegido  
+- As regras de acesso estejam consolidadas  
+- A migração para stateless seja apenas infraestrutura  
 
 ---
 
@@ -245,16 +286,13 @@ Ordem ideal:
 2️⃣ Aplicar ownership nos pedidos  
 3️⃣ Proteger endpoints de clientes  
 4️⃣ Criar rotas admin para listagens globais  
-
-Depois disso:
-
-👉 EF Core será apenas uma troca de infraestrutura — não uma mudança de comportamento.
+5️⃣ Migrar autenticação para JWT  
 
 ---
 
 # ⭐ Conclusão
 
-O TechStore já possui base arquitetural acima da média.
+O TechStore já possui uma base arquitetural **acima da média**.
 
 Esta dívida técnica não corrige um erro —  
 ela representa o próximo nível de maturidade do sistema.
