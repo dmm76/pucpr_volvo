@@ -1,71 +1,48 @@
+using Microsoft.EntityFrameworkCore;
 using TechStore.Core.Entities;
 using TechStore.Core.Interfaces;
-using TechStore.Infra.Fake;
-using TechStore.Infra.Fake.Factories;
+using TechStore.Infra.Context;
 
 namespace TechStore.Infra.Sql.Repositories;
 
 public class CategoriaRepositorySql : ICategoriaRepository
 {
-    private readonly List<Categoria> _data;
-    private int _nextId = 0;
+    private readonly TechStoreDbContext _ctx;
 
-    public CategoriaRepositorySql()
-    {
-        _data = CategoriaFactory.Criar();
+    public CategoriaRepositorySql(TechStoreDbContext ctx) => _ctx = ctx;
 
-        // atribui ids 1..N no seed
-        for (int i = 0; i < _data.Count; i++)
-        {
-            var id = i + 1;
-            FakeEntitySetter.SetPrivateId(_data[i], id);
-            _nextId = id;
-        }
-    }
+    public Categoria? BuscarPorId(int id) =>
+        _ctx.Categorias.AsNoTracking().FirstOrDefault(x => x.Id == id);
 
-    public Categoria? BuscarPorId(int id) => _data.FirstOrDefault(x => x.Id == id);
-
-    public List<Categoria> BuscarTodos() => _data.ToList();
+    public List<Categoria> BuscarTodos() => _ctx.Categorias.AsNoTracking().ToList();
 
     public Categoria Inserir(Categoria categoria)
     {
-        if (categoria is null)
-            throw new ArgumentNullException(nameof(categoria));
-
-        var id = Interlocked.Increment(ref _nextId);
-        FakeEntitySetter.SetPrivateId(categoria, id);
-
-        _data.Add(categoria);
+        _ctx.Categorias.Add(categoria);
+        _ctx.SaveChanges();
         return categoria;
     }
 
     public void Atualizar(Categoria categoria)
     {
-        if (categoria is null)
-            return;
-
-        var idx = _data.FindIndex(x => x.Id == categoria.Id);
-        if (idx < 0)
-            return;
-
-        _data[idx] = categoria;
+        _ctx.Categorias.Update(categoria);
+        _ctx.SaveChanges();
     }
 
     public void Remover(int id)
     {
-        var c = BuscarPorId(id);
-        if (c is null)
+        var entity = _ctx.Categorias.FirstOrDefault(x => x.Id == id);
+        if (entity is null)
             return;
-
-        _data.Remove(c);
+        _ctx.Categorias.Remove(entity);
+        _ctx.SaveChanges();
     }
 
     public bool ExisteNome(string nome)
     {
         if (string.IsNullOrWhiteSpace(nome))
             return false;
-
         var n = nome.Trim();
-        return _data.Any(x => x.Nome.Equals(n, StringComparison.OrdinalIgnoreCase));
+        return _ctx.Categorias.Any(x => x.Nome == n);
     }
 }

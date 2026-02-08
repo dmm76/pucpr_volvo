@@ -1,46 +1,45 @@
+using Microsoft.EntityFrameworkCore;
 using TechStore.Core.Entities;
 using TechStore.Core.Interfaces;
-using TechStore.Infra.Fake;
+using TechStore.Infra.Context;
 
 namespace TechStore.Infra.Sql.Repositories;
 
 public class ClienteRepositorySql : IClienteRepository
 {
-    private readonly List<Cliente> _data = new();
-    private int _nextId = 0;
+    private readonly TechStoreDbContext _ctx;
 
-    public Cliente? BuscarPorId(int id) => _data.FirstOrDefault(x => x.Id == id);
+    public ClienteRepositorySql(TechStoreDbContext ctx) => _ctx = ctx;
 
-    public Cliente? BuscarPorUserId(int userId) => _data.FirstOrDefault(x => x.UserId == userId);
+    public Cliente? BuscarPorId(int id) =>
+        _ctx.Clientes.Include(c => c.Enderecos).FirstOrDefault(c => c.Id == id);
 
-    public List<Cliente> BuscarTodos() => _data.ToList();
+    public Cliente? BuscarPorUserId(int userId) =>
+        _ctx.Clientes.Include(c => c.Enderecos).FirstOrDefault(c => c.UserId == userId);
+
+    public List<Cliente> BuscarTodos() => _ctx.Clientes.AsNoTracking().ToList();
 
     public Cliente Inserir(Cliente cliente)
     {
-        var id = Interlocked.Increment(ref _nextId);
-        FakeEntitySetter.SetPrivateId(cliente, id);
-
-        _data.Add(cliente);
+        _ctx.Clientes.Add(cliente);
+        _ctx.SaveChanges();
         return cliente;
     }
 
     public void Atualizar(Cliente cliente)
     {
-        var idx = _data.FindIndex(x => x.Id == cliente.Id);
-        if (idx < 0)
-            return;
-
-        _data[idx] = cliente;
+        _ctx.Clientes.Update(cliente);
+        _ctx.SaveChanges();
     }
 
     public void Remover(int id)
     {
-        var c = BuscarPorId(id);
-        if (c is null)
+        var entity = _ctx.Clientes.FirstOrDefault(x => x.Id == id);
+        if (entity is null)
             return;
-
-        _data.Remove(c);
+        _ctx.Clientes.Remove(entity);
+        _ctx.SaveChanges();
     }
 
-    public bool ExistePorUserId(int userId) => _data.Any(x => x.UserId == userId);
+    public bool ExistePorUserId(int userId) => _ctx.Clientes.Any(x => x.UserId == userId);
 }

@@ -13,7 +13,7 @@ using TechStore.Infra.Sql.Repositories;
 
 var builder = WebApplication.CreateBuilder(args);
 
-builder.Services.AddScoped<AuthState>();
+builder.Services.AddSingleton<AuthState>();
 builder.Services.AddSingleton<IPasswordHasher, PasswordHasher>();
 
 builder.Services.AddDbContext<TechStoreDbContext>(options =>
