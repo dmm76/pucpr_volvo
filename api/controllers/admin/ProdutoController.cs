@@ -20,6 +20,29 @@ public class ProdutoController : ControllerBase
         _auth = auth;
     }
 
+    [HttpGet("{id:int}")]
+    public ActionResult<ProdutoDto> BuscarPorId(int id) => Ok(_useCases.BuscarPorId(id));
+
+    [HttpGet]
+    public ActionResult<IReadOnlyList<ProdutoDto>> BuscarTodos(
+        [FromQuery] int skip = 0,
+        [FromQuery] int take = 10
+    )
+    {
+        if (skip < 0)
+            skip = 0;
+        if (take <= 0)
+            take = 10;
+        if (take > 100)
+            take = 100;
+
+        return Ok(_useCases.BuscarTodos(skip, take));
+    }
+
+    [HttpGet("categoria/{categoriaId:int}")]
+    public ActionResult<IReadOnlyList<ProdutoDto>> BuscarPorCategoria(int categoriaId) =>
+        Ok(_useCases.BuscarPorCategoria(categoriaId));
+
     [HttpPost]
     public IActionResult Criar([FromBody] CriarProdutoRequest request)
     {
@@ -67,14 +90,4 @@ public class ProdutoController : ControllerBase
         _useCases.Remover(id);
         return NoContent();
     }
-
-    [HttpGet("{id:int}")]
-    public ActionResult<ProdutoDto> BuscarPorId(int id) => Ok(_useCases.BuscarPorId(id));
-
-    [HttpGet]
-    public ActionResult<IReadOnlyList<ProdutoDto>> BuscarTodos() => Ok(_useCases.BuscarTodos());
-
-    [HttpGet("categoria/{categoriaId:int}")]
-    public ActionResult<IReadOnlyList<ProdutoDto>> BuscarPorCategoria(int categoriaId) =>
-        Ok(_useCases.BuscarPorCategoria(categoriaId));
 }

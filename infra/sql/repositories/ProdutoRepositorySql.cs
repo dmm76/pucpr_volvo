@@ -1,4 +1,5 @@
 using Microsoft.EntityFrameworkCore;
+using TechStore.Core.Dtos;
 using TechStore.Core.Entities;
 using TechStore.Core.Interfaces;
 using TechStore.Infra.Context;
@@ -50,4 +51,20 @@ public class ProdutoRepositorySql : IProdutoRepository
 
     public IReadOnlyList<Produto> BuscarPorCategoria(int categoriaId) =>
         _ctx.Produtos.AsNoTracking().Where(x => x.CategoriaId == categoriaId).ToList();
+
+    public List<ProdutoDto> BuscarTodosPaginado(int skip, int take) =>
+        _ctx
+            .Produtos.AsNoTracking()
+            .OrderBy(p => p.Id)
+            .Skip(skip)
+            .Take(take)
+            .Select(p => new ProdutoDto(
+                p.Id,
+                p.Nome ?? "",
+                p.Descricao,
+                p.PrecoAtual,
+                p.Estoque,
+                p.CategoriaId
+            ))
+            .ToList();
 }

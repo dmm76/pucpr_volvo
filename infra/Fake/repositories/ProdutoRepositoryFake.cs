@@ -1,3 +1,4 @@
+using TechStore.Core.Dtos;
 using TechStore.Core.Entities;
 using TechStore.Core.Interfaces;
 using TechStore.Infra.Fake.Factories;
@@ -63,4 +64,28 @@ public class ProdutoRepositoryFake : IProdutoRepository
 
     public IReadOnlyList<Produto> BuscarPorCategoria(int categoriaId) =>
         _data.Where(x => x.CategoriaId == categoriaId).ToList();
+
+    public List<ProdutoDto> BuscarTodosPaginado(int skip, int take)
+    {
+        if (skip < 0)
+            skip = 0;
+        if (take <= 0)
+            take = 10;
+        if (take > 100)
+            take = 100;
+
+        return _data
+            .OrderBy(p => p.Id)
+            .Skip(skip)
+            .Take(take)
+            .Select(p => new ProdutoDto(
+                p.Id,
+                p.Nome ?? "",
+                p.Descricao,
+                p.PrecoAtual,
+                p.Estoque,
+                p.CategoriaId
+            ))
+            .ToList();
+    }
 }

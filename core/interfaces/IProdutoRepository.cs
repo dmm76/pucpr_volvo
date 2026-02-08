@@ -1,3 +1,4 @@
+using TechStore.Core.Dtos;
 using TechStore.Core.Entities;
 
 namespace TechStore.Core.Interfaces;
@@ -13,4 +14,5 @@ public interface IProdutoRepository
 
     bool NomeJaExiste(string nome);
     IReadOnlyList<Produto> BuscarPorCategoria(int categoriaId);
+    List<ProdutoDto> BuscarTodosPaginado(int skip, int take);
 }

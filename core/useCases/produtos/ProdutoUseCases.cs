@@ -87,4 +87,7 @@ public class ProdutoUseCases
 
     private static ProdutoDto Map(Produto p) =>
         new(p.Id, p.Nome, p.Descricao, p.PrecoAtual, p.Estoque, p.CategoriaId);
+
+    public IReadOnlyList<ProdutoDto> BuscarTodos(int skip, int take) =>
+        _repo.BuscarTodosPaginado(skip, take);
 }
