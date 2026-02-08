@@ -2,61 +2,71 @@ using Microsoft.EntityFrameworkCore;
 using TechStore.Api.Auth;
 using TechStore.Api.Middleware;
 using TechStore.Api.Security;
+using TechStore.Core.Entities;
 using TechStore.Core.Interfaces;
 using TechStore.Core.useCases.categorias;
 using TechStore.Core.UseCases.Clientes;
 using TechStore.Core.UseCases.Pedidos;
 using TechStore.Core.UseCases.Produtos;
-using TechStore.infra.context;
-using TechStore.Infra.Fake.Repositories;
-using TechStore.Infra.Fake.Seed;
+using TechStore.Infra.Context;
+using TechStore.Infra.Sql.Repositories;
 
 var builder = WebApplication.CreateBuilder(args);
 
-// Auth (estado em memória)
-builder.Services.AddSingleton<AuthState>();
+builder.Services.AddScoped<AuthState>();
 builder.Services.AddSingleton<IPasswordHasher, PasswordHasher>();
 
-//Serico do EF
-builder.Services.AddDbContext<AgendaContext>(options =>
+builder.Services.AddDbContext<TechStoreDbContext>(options =>
     options.UseSqlServer(builder.Configuration.GetConnectionString("ConexaoPadrao"))
 );
 
-// Controllers + Swagger
 builder.Services.AddControllers();
 builder.Services.AddEndpointsApiExplorer();
 builder.Services.AddSwaggerGen();
 
-// DI (Fake Infra)
-builder.Services.AddSingleton<ICategoriaRepository, CategoriaRepositoryFake>();
-builder.Services.AddSingleton<IProdutoRepository, ProdutoRepositoryFake>();
-builder.Services.AddSingleton<IClienteRepository, ClienteRepositoryFake>();
-builder.Services.AddSingleton<IPedidoRepository, PedidoRepositoryFake>();
-builder.Services.AddSingleton<IUserRepository, UserRepositoryFake>();
+builder.Services.AddScoped<ICategoriaRepository, CategoriaRepositorySql>();
+builder.Services.AddScoped<IProdutoRepository, ProdutoRepositorySql>();
+builder.Services.AddScoped<IClienteRepository, ClienteRepositorySql>();
+builder.Services.AddScoped<IPedidoRepository, PedidoRepositorySql>();
+builder.Services.AddScoped<IUserRepository, UserRepositorySql>();
 
-// UseCases
-builder.Services.AddSingleton<CategoriaUseCases>();
-builder.Services.AddSingleton<ProdutoUseCases>();
-builder.Services.AddSingleton<PedidoUseCases>();
-builder.Services.AddSingleton<ClienteUseCases>();
-builder.Services.AddSingleton<CheckoutUseCases>();
+builder.Services.AddScoped<CategoriaUseCases>();
+builder.Services.AddScoped<ProdutoUseCases>();
+builder.Services.AddScoped<PedidoUseCases>();
+builder.Services.AddScoped<ClienteUseCases>();
+builder.Services.AddScoped<CheckoutUseCases>();
 
 var app = builder.Build();
+
+// migrate sempre
+using (var scope = app.Services.CreateScope())
+{
+    var db = scope.ServiceProvider.GetRequiredService<TechStoreDbContext>();
+    db.Database.Migrate();
+
+    if (app.Environment.IsDevelopment())
+    {
+        var hasher = scope.ServiceProvider.GetRequiredService<IPasswordHasher>();
+
+        if (!db.Users.Any(u => u.Login == "admin" || u.Email == "admin@techstore.com"))
+        {
+            db.Users.Add(
+                new User(
+                    login: "admin",
+                    email: "admin@techstore.com",
+                    senhaHash: hasher.Hash("Admin@123"),
+                    role: UserRole.Admin
+                )
+            );
+            db.SaveChanges();
+        }
+    }
+}
 
 if (app.Environment.IsDevelopment())
 {
     app.UseSwagger();
     app.UseSwaggerUI();
-}
-
-// SEED (Fake)
-using (var scope = app.Services.CreateScope())
-{
-    var userRepo = scope.ServiceProvider.GetRequiredService<IUserRepository>();
-    var clienteRepo = scope.ServiceProvider.GetRequiredService<IClienteRepository>();
-    var hasher = scope.ServiceProvider.GetRequiredService<IPasswordHasher>();
-
-    FakeSeedClientes.Seed(userRepo, clienteRepo, hasher);
 }
 
 app.UseHttpsRedirection();

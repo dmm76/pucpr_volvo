@@ -1,67 +1,53 @@
+using Microsoft.EntityFrameworkCore;
 using TechStore.Core.Entities;
 using TechStore.Core.Interfaces;
-using TechStore.Infra.Fake;
-using TechStore.Infra.Fake.Factories;
+using TechStore.Infra.Context;
 
 namespace TechStore.Infra.Sql.Repositories;
 
 public class ProdutoRepositorySql : IProdutoRepository
 {
-    private readonly List<Produto> _data = new();
-    private int _nextId = 0;
+    private readonly TechStoreDbContext _ctx;
 
-    public ProdutoRepositorySql()
-    {
-        _data = ProdutoFactory.Criar();
+    public ProdutoRepositorySql(TechStoreDbContext ctx) => _ctx = ctx;
 
-        // atribui ids 1..N no seed
-        for (int i = 0; i < _data.Count; i++)
-        {
-            var id = i + 1;
-            FakeEntitySetter.SetPrivateId(_data[i], id);
-            _nextId = id;
-        }
-    }
+    public Produto? BuscarPorId(int id) =>
+        _ctx.Produtos.AsNoTracking().FirstOrDefault(x => x.Id == id);
 
-    public Produto? BuscarPorId(int id) => _data.FirstOrDefault(x => x.Id == id);
-
-    public IReadOnlyList<Produto> BuscarTodos() => _data;
+    public IReadOnlyList<Produto> BuscarTodos() => _ctx.Produtos.AsNoTracking().ToList();
 
     public Produto Inserir(Produto produto)
     {
-        var id = Interlocked.Increment(ref _nextId);
-        FakeEntitySetter.SetPrivateId(produto, id);
-
-        _data.Add(produto);
+        _ctx.Produtos.Add(produto);
+        _ctx.SaveChanges();
         return produto;
     }
 
     public void Atualizar(Produto produto)
     {
-        var idx = _data.FindIndex(x => x.Id == produto.Id);
-        if (idx < 0)
-            return;
-
-        _data[idx] = produto;
+        _ctx.Produtos.Update(produto);
+        _ctx.SaveChanges();
     }
 
     public void Remover(int id)
     {
-        var p = BuscarPorId(id);
-        if (p is null)
+        var entity = _ctx.Produtos.FirstOrDefault(x => x.Id == id);
+        if (entity is null)
             return;
 
-        _data.Remove(p);
+        _ctx.Produtos.Remove(entity);
+        _ctx.SaveChanges();
     }
 
     public bool NomeJaExiste(string nome)
     {
-        if (string.IsNullOrWhiteSpace(nome))
+        var n = (nome ?? "").Trim();
+        if (n.Length == 0)
             return false;
-        var n = nome.Trim();
-        return _data.Any(x => x.Nome.Trim().Equals(n, StringComparison.OrdinalIgnoreCase));
+
+        return _ctx.Produtos.Any(x => x.Nome == n);
     }
 
     public IReadOnlyList<Produto> BuscarPorCategoria(int categoriaId) =>
-        _data.Where(x => x.CategoriaId == categoriaId).ToList();
+        _ctx.Produtos.AsNoTracking().Where(x => x.CategoriaId == categoriaId).ToList();
 }
