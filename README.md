@@ -171,7 +171,11 @@ Isso torna a API muito mais previsível para quem consome.
 
 ## 🗄️ Modelo do Banco de Dados
 
-![Modelo do Banco](https://github.com/dmm76/pucpr_volvo/blob/main/utils/images/Tabelas.JPG)
+<p align="center">
+  <img src="https://github.com/dmm76/pucpr_volvo/blob/main/utils/images/Tabelas.JPG" alt="Modelo do Banco" width="900">
+  <br>
+  <em>Modelo relacional do TechStore (EF Core + SQL Server).</em>
+</p>
 
 ### ✔️ Autenticação
 
