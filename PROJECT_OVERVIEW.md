@@ -1,50 +1,46 @@
-# TechStore --- Project Overview
+# 📌 Project Overview — TechStore
 
-## 🚀 O que é o TechStore?
+## Visão Geral
 
-Uma API backend para um ecommerce de informática projetada com
-mentalidade arquitetural desde o início.
+O TechStore é uma Web API para um e-commerce de informática construída com foco em boas práticas de engenharia de software.
 
-------------------------------------------------------------------------
+O projeto foi concebido para demonstrar maturidade arquitetural, domínio consistente e uso adequado de tecnologias modernas do ecossistema .NET.
 
-## 🎯 Objetivos
+---
 
--   Demonstrar domínio de arquitetura backend
--   Aplicar boas práticas
--   Construir um sistema previsível e escalável
+## Status do Projeto
 
-------------------------------------------------------------------------
+✔ Arquitetura definida  
+✔ Persistência com EF Core implementada  
+✔ SQL Server configurado  
+✔ Requisitos funcionais atendidos  
+✔ Segurança aplicada  
+✔ Relatórios implementados  
 
-## 🧩 Principais Componentes
+O sistema encontra-se estável e pronto para demonstração.
 
--   Domínio rico
--   UseCases
--   Repositórios desacoplados
--   Middleware global
--   Segurança com Guard
--   Swagger para testes
+---
 
-------------------------------------------------------------------------
+## Objetivo Acadêmico
 
-## 🔥 Diferenciais do Projeto
+Atender aos requisitos do projeto final através da construção de um backend robusto, demonstrando:
 
-Este projeto não é apenas funcional --- ele foi estruturado para
-refletir práticas usadas em sistemas profissionais.
+- organização arquitetural  
+- domínio consistente  
+- uso correto do ORM  
+- separação de camadas  
+- documentação técnica  
 
-------------------------------------------------------------------------
+---
 
-## 🛣️ Roadmap
+## Evolução do Projeto
 
-Próximos passos:
+O desenvolvimento seguiu uma abordagem progressiva:
 
-1.  Implementar Produto\
-2.  Criar fluxo de Pedido\
-3.  ✔ Persistência com EF Core implementada\
-4.  Evoluir autenticação\
-5.  Implementar logs
+1. Modelagem do domínio  
+2. Implementação de repositórios fake para acelerar validações arquiteturais  
+3. Migração para persistência real com EF Core  
+4. Implementação de segurança e regras de negócio  
+5. Consolidação dos requisitos finais  
 
-------------------------------------------------------------------------
-
-## 📌 Filosofia
-
-> Construir certo antes de construir grande.
+Essa estratégia permitiu construir o sistema com segurança e previsibilidade.

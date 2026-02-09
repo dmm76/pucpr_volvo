@@ -1,379 +1,113 @@
 # 🖥️ TechStore API
 
-### Backend arquitetado para um ecommerce moderno de informática
+Backend arquitetado para um e-commerce moderno de informática.
 
-> "Comece simples. Proteja o que é crítico."
-
----
-
-## 🚀 Sobre o Projeto
-
-O **TechStore** é uma Web API desenvolvida em **.NET**, projetada desde
-o início com **mentalidade arquitetural**, priorizando:
-
-- Domínio rico
-- Separação de responsabilidades
-- Previsibilidade
-- Código sustentável
-- Facilidade de evolução
-
-Este projeto não foi construído apenas para funcionar — foi
-estruturado para refletir **boas práticas utilizadas em sistemas
-profissionais.**
+> “Comece simples. Proteja o que é crítico.”
 
 ---
 
-## 🎯 Objetivo
+## 🧠 Sobre o Projeto
 
-Construir uma API robusta de ecommerce aplicando conceitos reais de
-engenharia de software:
+O **TechStore** é uma Web API desenvolvida em **.NET**, construída com mentalidade arquitetural desde o início.  
+O projeto evoluiu de uma infraestrutura fake — utilizada estrategicamente para permitir o amadurecimento do domínio — para **persistência real com Entity Framework Core e SQL Server**, atendendo integralmente aos requisitos do projeto final.
 
-✔️ Arquitetura em camadas  
-✔️ Entidades com comportamento  
-✔️ Controllers finos  
-✔️ Regras no domínio  
-✔️ Tratamento global de exceções  
-✔️ Segurança por autorização  
-✔️ Infraestrutura desacoplada
-
----
-
-## 🧠 Filosofia Arquitetural
-
-Este projeto segue dois princípios fundamentais:
-
-> **Comece simples. Proteja o que é crítico.**
-
-e
-
-> **Você não precisa começar perfeito — apenas evitar erros perigosos:**
->
-> - estado público
-> - regra espalhada
-> - dependência acoplada
-> - objetos anêmicos
+Essa abordagem demonstra uma evolução controlada da arquitetura, reduzindo acoplamento e evitando refatorações de alto risco.
 
 ---
 
 ## 🏗️ Arquitetura
 
-O TechStore foi inspirado nos conceitos da **Clean Architecture**,
-mantendo o domínio como centro do sistema.
+O projeto segue uma separação clara de responsabilidades:
 
-```
-Controllers → UseCases → Domain → Repositories
-```
+- **Core (Domínio)** → Entidades ricas e regras de negócio centralizadas  
+- **UseCases (Aplicação)** → Orquestração das operações do sistema  
+- **Infra (Persistência)** → EF Core + SQL Server  
+- **API** → Controllers REST com validações e middleware global  
 
-### 🔵 Domain (Core)
+Princípios aplicados:
 
-Contém as regras de negócio e entidades:
-
-- Categoria
-- Produto
-- Cliente
-- Endereco
-- Pedido
-- ItemPedido
-- User
-
-👉 Todas seguem o modelo:
-
-✅ `private set`  
-✅ métodos de domínio  
-✅ validações internas
-
-Resultado: um sistema mais seguro e previsível.
+- Separation of Concerns  
+- Dependency Injection  
+- Fail Fast  
+- Domínio rico (Rich Domain Model)  
 
 ---
 
-### 🟢 UseCases
+## 🗄️ Modelo do Banco de Dados
 
-Responsáveis por orquestrar as operações do sistema.
-
-Exemplos:
-
-- Criar carrinho
-- Adicionar itens
-- Identificar cliente
-- Definir endereço
-- Confirmar pedido
-- Realizar pagamento
-
-Controllers não possuem regra de negócio.
+![Modelo do Banco](utils/images/Tabelas.JPG)
 
 ---
 
-### 🟡 Infra (Fake)
+## ⚙️ Tecnologias
 
-O projeto evoluiu de repositórios em memória para persistência real com Entity Framework Core e SQL Server para:
+- .NET  
+- ASP.NET Core  
+- Entity Framework Core  
+- SQL Server  
+- Swagger  
 
-✔️ acelerar o desenvolvimento  
-✔️ focar na arquitetura  
-✔️ evitar complexidade prematura
+---
 
-Uma evolução natural será a integração com **Entity Framework Core**.
+## 🧱 Persistência
+
+O sistema utiliza **Entity Framework Core** com migrations versionadas, garantindo:
+
+- integridade relacional  
+- versionamento do banco  
+- comportamento próximo de ambientes reais  
+- previsibilidade de deploy  
+
+Os repositórios fake foram mantidos apenas como apoio didático e para possíveis cenários de teste.
 
 ---
 
 ## 🔐 Segurança
 
-O sistema possui proteção de rotas administrativas através do:
+O projeto implementa:
 
-### ✅ AdminGuard
+- Autorização baseada em papéis (Admin/User)  
+- Ownership (usuário acessa apenas seus próprios recursos)  
+- Guards de proteção nos endpoints críticos  
 
-Bloqueia acesso quando:
-
-- usuário não está logado
-- usuário não é admin
-
-Garantindo consistência de autorização.
+O uso atual de `AuthState` em memória é uma decisão consciente para simplificação do fluxo acadêmico, com evolução planejada para autenticação stateless (JWT).
 
 ---
 
-## ⚙️ Autenticação (Modo Demonstração)
+## 🚀 Funcionalidades Implementadas
 
-Para simplificar testes e apresentações:
+### Produtos
+✅ CRUD completo  
+✅ Paginação (skip/take)  
+✅ Filtros opcionais  
+✅ Validação de categoria  
 
-👉 O projeto utiliza um **AuthState Singleton**, mantendo o usuário
-autenticado em memória.
+### Pedidos
+✅ Carrinho  
+✅ Baixa automática de estoque  
+✅ Snapshot de preço  
+✅ Proteção contra estoque insuficiente  
 
-### Por que essa decisão?
-
-Porque arquitetura boa também significa:
-
-> **não introduzir complexidade antes da hora.**
-
-### Evolução planejada:
-
-✔️ JWT  
-✔️ autenticação stateless  
-✔️ refresh tokens
+### Relatórios
+✅ Total vendido por categoria  
 
 ---
 
-## 🌍 Middleware Global
+## 📌 Decisões Arquiteturais
 
-### ✅ ExceptionMiddleware
+O projeto prioriza domínio rico e regras de negócio centralizadas nas entidades, evitando lógica em controllers e favorecendo manutenibilidade.
 
-Transforma exceções de domínio em respostas HTTP padronizadas:
+Decisões detalhadas podem ser consultadas em:
 
-| Exception             | Status |
-| --------------------- | ------ |
-| BusinessRuleException | 400    |
-| NotFoundException     | 404    |
-| Exception             | 500    |
-
-Isso torna a API muito mais previsível para quem consome.
+👉 `DECISIONS.md`
 
 ---
 
-## 📦 Funcionalidades Implementadas
+## 📄 Dívidas Técnicas
 
-## 🗄️ Modelo do Banco de Dados
+Dívidas técnicas são tratadas de forma transparente e documentadas:
 
-<p align="center">
-  <img src="https://github.com/dmm76/pucpr_volvo/blob/main/utils/images/Tabelas.JPG" alt="Modelo do Banco" width="900">
-  <br>
-  <em>Modelo relacional do TechStore (EF Core + SQL Server).</em>
-</p>
+- `TECH_DEBT_PT.md`  
+- `TECH_DEBT_SECURITY.md`  
 
-### ✔️ Autenticação
-
-- Login
-- Logout
-- Status
-
----
-
-### ✔️ Categorias
-
-- Criar
-- Listar
-- Buscar por Id
-
----
-
-### ✔️ Produtos
-
-- Cadastro (admin)
-- Listagem pública
-- Busca por Id
-- Validações de domínio
-- Controle de estoque
-
----
-
-### ✔️ Clientes
-
-- Cadastro com criação automática de User
-- Seed inicial com clientes e endereços
-- Associação User ↔ Cliente
-- Estrutura preparada para múltiplos endereços
-
----
-
-### ✔️ Carrinho / Pedido (Checkout Completo)
-
-Fluxo real de ecommerce implementado:
-
-✔️ Criar carrinho  
-✔️ Adicionar e remover itens  
-✔️ Snapshot do preço do produto  
-✔️ Identificação automática do cliente (snapshot do nome)  
-✔️ Snapshot do endereço de entrega  
-✔️ Atalho para usar endereço padrão  
-✔️ Definição de forma de pagamento  
-✔️ Validação de regras antes da confirmação  
-✔️ Baixa automática de estoque ao pagar
-
-👉 O pedido preserva **snapshots**, garantindo histórico mesmo que os dados do cliente mudem.
-
----
-
-## 🔥 Diferenciais Arquiteturais
-
-Este projeto demonstra práticas vistas em sistemas profissionais:
-
-✅ Domínio rico (não anêmico)  
-✅ Separação clara de camadas  
-✅ UseCases enxutos  
-✅ Controllers mínimos  
-✅ Middleware global  
-✅ ErrorCodes padronizados  
-✅ Tradução centralizada de erros  
-✅ Seed para facilitar demonstrações  
-✅ Checkout com comportamento real
-
----
-
-## 🧪 Roteiro de Demonstração (Swagger)
-
-Fluxo recomendado para apresentação:
-
-### 1️⃣ Conferir dados
-
-```
-GET /api/clientes
-GET /api/produtos
-```
-
-### 2️⃣ Criar carrinho
-
-```
-POST /api/pedidos
-```
-
-### 3️⃣ Adicionar item
-
-```
-POST /api/pedidos/{pedidoId}/itens
-{
-  "produtoId": 1,
-  "quantidade": 2
-}
-```
-
-### 4️⃣ Identificar cliente (snapshot automático)
-
-```
-PUT /api/pedidos/{pedidoId}/cliente
-{
-  "clienteId": 1
-}
-```
-
-### 5️⃣ Usar endereço padrão (atalho premium)
-
-```
-PUT /api/pedidos/{pedidoId}/usar-endereco-padrao/1
-```
-
-### 6️⃣ Definir pagamento
-
-```
-PUT /api/pedidos/{pedidoId}/pagamento
-{
-  "formaPagamento": 1
-}
-```
-
-### 7️⃣ Confirmar e pagar
-
-```
-POST /api/pedidos/{pedidoId}/confirmar
-POST /api/pedidos/{pedidoId}/pagar
-```
-
-### 8️⃣ Provar baixa de estoque
-
-```
-GET /api/produtos/{id}
-```
-
-👉 Resultado esperado: estoque reduzido.
-
----
-
-## 🛠️ Tecnologias
-
-- .NET
-- ASP.NET Core Web API
-- Swagger
-- C#
-- Injeção de Dependência
-- Middleware
-
----
-
-## ▶️ Como Executar
-
-```bash
-dotnet build
-dotnet run
-```
-
-Acesse:
-
-👉 `https://localhost:{porta}/swagger`
-
----
-
-## 📚 Documentação Arquitetural
-
-O projeto possui documentação complementar:
-
-- 📄 ARCHITECTURE.md
-- 📄 DECISIONS.md
-- 📄 PROJECT_OVERVIEW.md
-
-Esses arquivos registram as decisões técnicas e o estado arquitetural do
-sistema.
-
----
-
-## 👨‍💻 Autor
-
-**Douglas Marcelo Monquero**  
-Engenharia de Software
-
-Desenvolvendo software com mentalidade de longo prazo.
-
----
-
-## ⭐ Observação Final
-
-Este projeto representa mais do que código.
-
-Representa a transição de:
-
-👉 _aprender a programar_  
-para  
-👉 **aprender a construir sistemas.**
-
-
-## 🧱 Persistência
-
-- Entity Framework Core  
-- SQL Server  
-- Migrations automatizadas  
-
+Essa prática reforça a maturidade do projeto e facilita sua evolução futura.

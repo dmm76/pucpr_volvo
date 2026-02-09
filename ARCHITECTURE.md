@@ -1,135 +1,70 @@
-# TechStore --- Visão Arquitetural
+# 🏗️ Architecture — TechStore
 
-## 🎯 Objetivo do Sistema
+## Visão Geral
 
-API backend de um ecommerce de informática, construída seguindo
-princípios de arquitetura limpa, separação de responsabilidades e
-domínio rico.
+O TechStore foi projetado com foco em previsibilidade, baixo acoplamento e clareza arquitetural.
 
-------------------------------------------------------------------------
+A estratégia adotada permitiu evoluir o domínio antes da persistência, reduzindo riscos estruturais e garantindo uma migração segura para banco real.
 
-## 🧠 Decisões Arquiteturais
+---
 
--   Camadas inspiradas em Clean Architecture
--   Domínio como centro do sistema
--   Controllers finos
--   Regras dentro das Entities
+## Camadas
 
-------------------------------------------------------------------------
+### Domain (Core)
+Responsável por concentrar as regras de negócio.
 
-## ✔️ Autenticação (Modo Demonstração)
+Características:
 
-**Estratégia atual:** - AuthState Singleton mantém usuário logado em
-memória. - AdminGuard protege rotas administrativas.
+- Entidades ricas  
+- Validações internas  
+- Fail Fast  
+- Independência de infraestrutura  
 
-**Motivo:** simplificação para demonstração e banca.\
-**Evolução futura:** JWT / autenticação stateless.
+---
 
-------------------------------------------------------------------------
+### Application (UseCases)
+Orquestra os fluxos do sistema.
 
-## 🧱 Estrutura do Projeto
+Responsabilidades:
 
-### Core (Coração do sistema)
+- Coordenação entre repositórios e domínio  
+- Garantia de regras de aplicação  
+- Exposição de operações para a API  
 
-**Entities (Domínio Rico):** - Categoria --- validações e métodos de
-domínio - Produto - Cliente - Pedido - ItemPedido - User
+---
 
-Todas seguem: \> estado protegido + comportamento
+### Infrastructure
 
-------------------------------------------------------------------------
+O sistema utiliza **Entity Framework Core** como ORM principal.
 
-## Exceptions
+A infraestrutura fake foi utilizada apenas durante a fase inicial para permitir evolução segura do domínio.  
+Após a estabilização do modelo, a aplicação migrou para **SQL Server**, mantendo compatibilidade arquitetural.
 
--   BusinessRuleException → violações de regra
--   NotFoundException → recurso inexistente
+Benefícios dessa abordagem:
 
-------------------------------------------------------------------------
+- evolução segura do domínio  
+- baixo acoplamento  
+- migração sem refatorações críticas  
 
-## Middleware Global
+---
 
-### ExceptionMiddleware
+### API
 
-Converte exceções em respostas HTTP padronizadas.
+Responsável pela exposição REST do sistema.
 
-  Exception      HTTP
-  -------------- ------
-  BusinessRule   400
-  NotFound       404
-  Unexpected     500
+Inclui:
 
-------------------------------------------------------------------------
+- Controllers organizados  
+- Middleware global de exceções  
+- Status codes adequados  
+- Swagger para documentação  
 
-## Infra (Fake)
+---
 
-A infraestrutura fake foi utilizada apenas durante a fase inicial para permitir evolução segura do domínio. O projeto agora utiliza Entity Framework Core como mecanismo principal de persistência.
+## Princípios Arquiteturais
 
-### FakeEntitySetter
-
-Permite setar propriedades privadas via reflection mantendo o domínio
-protegido.
-
-------------------------------------------------------------------------
-
-## UseCases
-
-Controllers apenas orquestram --- regras vivem no domínio.
-
-### CategoriaUseCases
-
--   Listar
--   BuscarPorId
--   Criar
-
-------------------------------------------------------------------------
-
-## Segurança
-
-### AdminGuard
-
-Bloqueia quando: - não logado - não admin
-
-Retornos: - 401 --- não autenticado - 403 --- sem permissão
-
-------------------------------------------------------------------------
-
-## 📊 Estado Atual do Sistema
-
-### ✔️ Implementado
-
--   Auth
--   Guard
--   Exception Middleware
--   Categoria (domínio completo)
--   Seed fake
--   Swagger
--   UseCases
-
-### 🚧 Próximo módulo
-
-👉 Produto --- agregado central do ecommerce.
-
-------------------------------------------------------------------------
-
-## 🧭 Filosofia do Projeto
-
-> "Comece simples. Proteja o que é crítico."
-
-Evita: - estado público - regra espalhada - objetos anêmicos
-
-------------------------------------------------------------------------
-
-## 💡 Evoluções Planejadas
-
--   Produto
--   Carrinho / Pedido
--   Persistência real
--   JWT
--   Logs estruturados
--   Cache
-
-------------------------------------------------------------------------
-
-## 🧠 Autor
-
-Douglas Marcelo Monquero\
-Engenharia de Software
+- Separation of Concerns  
+- Dependency Injection  
+- Rich Domain Model  
+- Fail Fast  
+- Baixo acoplamento  
