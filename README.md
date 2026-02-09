@@ -105,7 +105,7 @@ Controllers não possuem regra de negócio.
 
 ### 🟡 Infra (Fake)
 
-Durante a fase inicial, o projeto utiliza repositórios em memória para:
+O projeto evoluiu de repositórios em memória para persistência real com Entity Framework Core e SQL Server para:
 
 ✔️ acelerar o desenvolvimento  
 ✔️ focar na arquitetura  
@@ -369,3 +369,11 @@ Representa a transição de:
 👉 _aprender a programar_  
 para  
 👉 **aprender a construir sistemas.**
+
+
+## 🧱 Persistência
+
+- Entity Framework Core  
+- SQL Server  
+- Migrations automatizadas  
+

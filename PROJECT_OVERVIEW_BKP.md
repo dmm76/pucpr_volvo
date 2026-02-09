@@ -39,7 +39,7 @@ Próximos passos:
 
 1.  Implementar Produto\
 2.  Criar fluxo de Pedido\
-3.  ✔ Persistência com EF Core implementada\
+3.  Integrar banco real\
 4.  Evoluir autenticação\
 5.  Implementar logs
 

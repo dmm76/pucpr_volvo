@@ -61,7 +61,7 @@ Converte exceções em respostas HTTP padronizadas.
 
 ## Infra (Fake)
 
-A infraestrutura fake foi utilizada apenas durante a fase inicial para permitir evolução segura do domínio. O projeto agora utiliza Entity Framework Core como mecanismo principal de persistência.
+Repositórios fake permitem desenvolvimento sem banco real.
 
 ### FakeEntitySetter
 
