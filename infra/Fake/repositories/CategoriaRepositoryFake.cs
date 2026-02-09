@@ -67,4 +67,11 @@ public class CategoriaRepositoryFake : ICategoriaRepository
         var n = nome.Trim();
         return _data.Any(x => x.Nome.Equals(n, StringComparison.OrdinalIgnoreCase));
     }
+
+    public bool ExistePorId(int id)
+    {
+        if (id <= 0)
+            return false;
+        return _data.Any(x => x.Id == id);
+    }
 }

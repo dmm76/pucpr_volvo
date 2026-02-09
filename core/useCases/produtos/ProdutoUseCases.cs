@@ -8,10 +8,12 @@ namespace TechStore.Core.UseCases.Produtos;
 public class ProdutoUseCases
 {
     private readonly IProdutoRepository _repo;
+    private readonly ICategoriaRepository _categoriaRepo;
 
-    public ProdutoUseCases(IProdutoRepository repo)
+    public ProdutoUseCases(IProdutoRepository repo, ICategoriaRepository categoriaRepo)
     {
         _repo = repo;
+        _categoriaRepo = categoriaRepo;
     }
 
     public ProdutoDto Criar(
@@ -24,6 +26,9 @@ public class ProdutoUseCases
     {
         if (_repo.NomeJaExiste(nome))
             throw new BusinessRuleException(ErrorCodes.ProductNameAlreadyExists);
+
+        if (!_categoriaRepo.ExistePorId(categoriaId))
+            throw new NotFoundException(ErrorCodes.CategoriaNotFound);
 
         var produto = new Produto(categoriaId, nome, preco, estoque, descricao);
 
@@ -52,6 +57,8 @@ public class ProdutoUseCases
         {
             throw new BusinessRuleException(ErrorCodes.ProductNameAlreadyExists);
         }
+        if (!_categoriaRepo.ExistePorId(categoriaId))
+            throw new NotFoundException(ErrorCodes.CategoriaNotFound);
 
         produto.DefinirCategoria(categoriaId);
         produto.AtualizarNome(nome);

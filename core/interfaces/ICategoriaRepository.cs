@@ -13,4 +13,6 @@ public interface ICategoriaRepository
     void Remover(int id);
 
     bool ExisteNome(string nome);
+
+    bool ExistePorId(int id);
 }

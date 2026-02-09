@@ -45,4 +45,13 @@ public class CategoriaRepositorySql : ICategoriaRepository
         var n = nome.Trim();
         return _ctx.Categorias.Any(x => x.Nome == n);
     }
+
+    public bool ExistePorId(int id)
+    {
+        if (id <= 0)
+            return false;
+
+        var exists = _ctx.Categorias.Any(c => c.Id == id);
+        return exists;
+    }
 }
