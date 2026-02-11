@@ -1,87 +1,130 @@
-# TECH_DEBT.md
+# 📌 Technical Debt — TechStore
 
-## Registro de Débito Técnico
+Este documento registra os débitos técnicos conhecidos do **TechStore**.
 
-Este documento registra os débitos técnicos conhecidos do projeto
-**TechStore**.\
-Todos os itens listados aqui são **decisões intencionais**, tomadas para
-priorizar a entrega dos fluxos principais de negócio mantendo uma
-arquitetura limpa e evolutiva.
+Todos os itens listados são **decisões conscientes**, tomadas para priorizar a estabilidade arquitetural e a entrega dos fluxos críticos do sistema.
 
-------------------------------------------------------------------------
+> Débito técnico não é sinal de negligência —  
+> é o resultado de decisões intencionais sob restrições reais.
 
-## 1. Testes Automatizados utilizando Repositórios Fake
+---
 
-**Status:** Pendente\
-**Prioridade:** Média\
-**Nível de Risco:** Baixo (contexto acadêmico atual)
+## 🧭 Princípio Norteador
+
+O TechStore adota uma abordagem pragmática:
+
+✔ documentar  
+✔ entender o impacto  
+✔ definir um caminho de evolução  
+
+Débitos se tornam perigosos apenas quando são invisíveis.
+
+---
+
+# 🔎 Débitos Técnicos Atuais
+
+---
+
+## 1️⃣ Ausência de Testes Automatizados
+
+**Status:** Pendente  
+**Prioridade:** Média  
+**Risco:** Baixo (contexto acadêmico / demonstrativo)
+
+---
 
 ### Contexto
 
-Os repositórios fake foram implementados para simular a persistência e
-permitir a execução rápida e isolada da lógica de negócio sem depender
-de banco de dados.
+A arquitetura já foi projetada para ser testável — com domínio isolado e baixo acoplamento — porém a implementação dos testes foi adiada para priorizar a consolidação das regras de negócio.
 
-Embora a arquitetura já esteja preparada para testes, a implementação
-dos testes automatizados foi adiada para priorizar os fluxos centrais do
-domínio.
+A decisão evitou investir em testes enquanto o modelo ainda estava em evolução.
 
-### Por que esta decisão é aceitável
+---
 
--   A arquitetura já é testável.
--   A infraestrutura está devidamente isolada do Core.
--   Os repositórios fake permitem comportamento determinístico.
--   Nenhum compromisso estrutural foi introduzido.
+### Justificativa Arquitetural
 
-### Impacto
+- o Core permanece independente  
+- regras estão centralizadas  
+- repositórios são substituíveis  
+- comportamento é previsível  
 
-O impacto atual é mínimo porque:
+Nenhum atalho estrutural foi introduzido.
 
--   O projeto está em fase acadêmica / demonstrativa.
--   As regras de negócio permanecem centralizadas no domínio.
--   Os repositórios podem ser substituídos sem afetar a camada de
-    aplicação.
+---
 
-### Plano Futuro
+### Impacto Atual
 
-Implementar testes automatizados com foco no comportamento do negócio:
+Baixo, pois:
 
--   Testes unitários para **ProdutoUseCases**
--   Testes unitários para **PedidoUseCases**
--   Validação das invariantes do domínio
--   Validação dos fluxos de erro
--   Cobertura de cenários com repositórios fake
+- o sistema encontra-se estável  
+- o projeto possui caráter acadêmico  
+- o domínio está protegido  
 
-------------------------------------------------------------------------
+---
 
-## Princípio Norteador
+### Plano de Evolução
 
-> **"Prefira um débito técnico consciente a uma arquitetura
-> acidental."**
+Implementar testes focados em comportamento:
 
-Débito técnico é aceitável quando:
+✔ testes unitários para UseCases  
+✔ validação das invariantes do domínio  
+✔ testes de fluxos críticos  
+✔ cenários de erro  
+✔ cobertura com repositórios fake  
 
--   Está documentado\
--   É intencional\
--   Não compromete o design do sistema\
--   Existe um caminho claro para resolução
+> Testes devem proteger o domínio — não apenas aumentar métricas.
 
-------------------------------------------------------------------------
+---
 
-## Observação Arquitetural
+## 📈 Estratégia de Gestão do Débito
 
-A arquitetura atual segue os seguintes princípios:
+O TechStore evita dois extremos perigosos:
 
--   Domínio protegido de preocupações de infraestrutura\
--   Camada de persistência substituível\
--   Infraestrutura fake utilizada estritamente para testes e
-    desenvolvimento\
--   Nenhuma adaptação do domínio para suportar implementações fake
+### ❌ Ignorar o débito  
+### ❌ Tentar eliminá-lo prematuramente  
 
-Isso garante que melhorias futuras --- incluindo testes automatizados
---- possam ser adicionadas com segurança, sem necessidade de
-refatorações estruturais.
+A estratégia adotada é **débitos conscientes e controlados**.
 
-------------------------------------------------------------------------
+Antes de assumir qualquer débito, uma pergunta guia a decisão:
 
-**Última atualização:** 2026-02-05
+> **Isso compromete a arquitetura ou apenas adia uma melhoria?**
+
+Se comprometer — não é débito.  
+É erro de design.
+
+---
+
+## 🧠 Observação Arquitetural
+
+A arquitetura atual garante que os débitos possam ser resolvidos sem refatorações traumáticas, pois mantém:
+
+✔ domínio isolado  
+✔ persistência desacoplada  
+✔ responsabilidades bem definidas  
+✔ ausência de adaptações estruturais temporárias  
+
+Isso preserva a capacidade de evolução do sistema.
+
+---
+
+## 🚀 Próximos Débitos Prováveis (Evolução Natural)
+
+À medida que o sistema crescer, novos débitos podem surgir — de forma planejada — como parte da evolução do software:
+
+- testes de integração  
+- observabilidade  
+- logs estruturados  
+- cache  
+- políticas avançadas de segurança  
+
+Antecipar esses pontos reduz o custo de mudança.
+
+---
+
+## 💡 Filosofia
+
+> Prefira um débito técnico consciente  
+> a uma arquitetura acidental.
+
+> Software sustentável não é o que não possui débitos —  
+> é o que consegue administrá-los.
