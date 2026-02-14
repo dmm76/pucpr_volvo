@@ -1,63 +1,181 @@
-# TechStore --- Architecture Decision Records (ADR)
+# 📘 Architecture Decision Records — TechStore
 
-## ADR-001 --- Autenticação em memória
+Este documento registra as principais decisões arquiteturais do projeto **TechStore**.
 
-**Status:** Ativo (Modo demonstração)
+O objetivo é preservar o contexto técnico, reduzir dependência de conhecimento implícito e facilitar a evolução segura do sistema.
 
-**Contexto:** Necessidade de autenticação simples para facilitar testes
-no Swagger e apresentação para banca.
+> Decisões não documentadas se tornam decisões esquecidas.
 
-**Decisão:** Utilizar AuthState como Singleton para manter o usuário
-logado.
+---
 
-**Consequências:** - Simples de explicar - Rápido para testar - Não
-indicado para produção
+## 🧭 Como ler este documento
 
-**Evolução futura:** JWT.
+Cada ADR descreve:
 
-------------------------------------------------------------------------
+- contexto do problema  
+- decisão tomada  
+- consequências  
+- direção futura  
 
-## ADR-002 --- Domínio rico
+O foco não é apenas **o que foi decidido**, mas **por que foi decidido**.
 
-**Status:** Ativo
+---
 
-**Decisão:** Entidades com `private set` e métodos de domínio.
+# ADR-001 — Autenticação em Memória
 
-**Motivo:** Evitar objetos anêmicos e centralizar regras.
+**Status:** Ativo (modo demonstração)  
+**Data:** 2026  
 
-**Consequência:** Código mais previsível e alinhado com práticas
-profissionais.
+## Contexto
+Era necessário implementar autenticação rapidamente para permitir testes via Swagger e viabilizar a apresentação do sistema sem aumentar a complexidade inicial.
 
-------------------------------------------------------------------------
+## Decisão
+Utilizar um `AuthState` como Singleton para manter o estado de autenticação em memória.
 
-## ADR-003 --- Repositórios Fake
+## Consequências
 
-**Status:** Temporário
+### Positivas
+✔ implementação simples  
+✔ fluxo fácil de demonstrar  
+✔ baixo custo de manutenção inicial  
 
-**Decisão:** Usar infraestrutura fake para desenvolvimento inicial.
+### Negativas
+⚠ não escalável  
+⚠ não adequado para produção  
+⚠ dependente de estado da aplicação  
 
-**Motivo:** Foco em arquitetura antes da persistência.
+## Evolução Planejada
+Migrar para autenticação stateless utilizando **JWT**.
 
-**Evolução futura:** EF Core ou outro ORM.
+> Decisão consciente para reduzir complexidade prematura.
 
-------------------------------------------------------------------------
+---
 
-## ADR-004 --- Middleware Global de Exceções
+# ADR-002 — Domínio Rico
 
-**Status:** Ativo
+**Status:** Ativo  
 
-**Decisão:** Converter exceções de domínio em respostas HTTP
-padronizadas.
+## Contexto
+Sistemas com regras espalhadas tendem a se tornar imprevisíveis e difíceis de manter.
 
-**Benefícios:** - API previsível - Melhor experiência de consumo -
-Facilidade de debug
+## Decisão
+Centralizar regras de negócio nas entidades, utilizando:
 
-------------------------------------------------------------------------
+- `private set`  
+- métodos de domínio  
+- validações internas  
 
-## ADR-005 --- Guard para rotas Admin
+## Consequências
 
-**Status:** Ativo
+### Positivas
+✔ maior previsibilidade  
+✔ proteção contra modelos anêmicos  
+✔ regras próximas dos dados  
+✔ código mais expressivo  
 
-**Decisão:** Centralizar verificação de login e role em um AdminGuard.
+### Trade-off
+⚠ curva de aprendizado maior para quem não está habituado ao padrão.
 
-**Motivo:** Evitar repetição de código e garantir segurança consistente.
+> Preferimos complexidade localizada no domínio do que complexidade espalhada pelo sistema.
+
+---
+
+# ADR-003 — Uso Inicial de Repositórios Fake
+
+**Status:** Concluído (fase de transição encerrada)
+
+## Contexto
+No início do projeto, o domínio ainda estava em evolução. Acoplar o sistema prematuramente ao banco poderia gerar refatorações caras.
+
+## Decisão
+Utilizar repositórios fake para permitir:
+
+- validação rápida das regras  
+- testes manuais previsíveis  
+- evolução segura do modelo  
+
+## Consequências
+
+### Positivas
+✔ maior velocidade de desenvolvimento  
+✔ domínio estabilizado antes da persistência  
+✔ baixo risco estrutural  
+
+### Negativas
+⚠ ausência de validação relacional real durante a fase inicial  
+
+## Resultado
+Após a estabilização do domínio, o sistema migrou com segurança para **Entity Framework Core + SQL Server**, sem necessidade de refatorações críticas.
+
+> Evolução arquitetural controlada reduz riscos futuros.
+
+---
+
+# ADR-004 — Middleware Global de Exceções
+
+**Status:** Ativo  
+
+## Contexto
+Permitir que cada controller trate exceções gera inconsistência nas respostas da API e aumenta a duplicação de código.
+
+## Decisão
+Centralizar o tratamento de exceções em um middleware global, responsável por converter erros de domínio em respostas HTTP padronizadas.
+
+## Consequências
+
+### Positivas
+✔ respostas previsíveis  
+✔ melhor experiência para consumidores da API  
+✔ redução de código repetido  
+✔ facilidade de observabilidade futura  
+
+### Trade-off
+⚠ exige disciplina na criação de exceções de domínio.
+
+> O sistema deve reagir de forma consistente — independente de onde o erro ocorreu.
+
+---
+
+# ADR-005 — Guard para Rotas Administrativas
+
+**Status:** Ativo  
+
+## Contexto
+Repetir validações de autorização nos controllers aumenta o risco de falhas de segurança.
+
+## Decisão
+Criar um **AdminGuard** para centralizar a verificação de login e permissões.
+
+## Consequências
+
+### Positivas
+✔ segurança consistente  
+✔ redução de duplicação  
+✔ regras de acesso explícitas  
+
+### Trade-off
+⚠ pequena camada adicional no fluxo de requisição.
+
+> Segurança não deve depender de memória do desenvolvedor — mas da arquitetura.
+
+---
+
+## 📈 Direção Arquitetural
+
+As decisões do TechStore seguem um princípio central:
+
+> **Evitar complexidade prematura, sem comprometer a evolução futura.**
+
+A arquitetura foi pensada para crescer de forma sustentável, priorizando previsibilidade e baixo acoplamento.
+
+---
+
+## 💡 Filosofia de Decisão
+
+Antes de introduzir qualquer tecnologia ou padrão, uma pergunta guia o processo:
+
+> **Isso reduz ou aumenta o custo de mudança do sistema?**
+
+Se aumentar — provavelmente é cedo demais.
+
+Se reduzir — provavelmente é arquitetura.

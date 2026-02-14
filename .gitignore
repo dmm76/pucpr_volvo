@@ -1,4 +1,11 @@
-**/bin/
-**/obj/
+# build output
 bin/
 obj/
+**/bin/
+**/obj/
+
+# user/ide
+.vs/
+.vscode/
+*.user
+*.suo

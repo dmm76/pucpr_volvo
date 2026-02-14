@@ -47,14 +47,12 @@ public class ExceptionMiddleware
         {
             _logger.LogError(
                 ex,
-                "Unhandled exception. TraceId: {TraceId}",
+                "Unhandled exception. {Method} {Path}. Code: {Code}. Status: {Status}. TraceId: {TraceId}",
+                context.Request.Method,
+                context.Request.Path.Value,
+                ErrorCodes.InternalServerError,
+                (int)HttpStatusCode.InternalServerError,
                 context.TraceIdentifier
-            );
-
-            await WriteProblem(
-                context,
-                HttpStatusCode.InternalServerError,
-                ErrorCodes.InternalServerError
             );
         }
     }
