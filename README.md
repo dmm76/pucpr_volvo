@@ -13,16 +13,15 @@ Backend arquitetado para um e-commerce moderno com mentalidade de engenharia pro
 > ⚡ **Abra o Swagger e teste a API em menos de 1 minuto.**
 
 👉 **Swagger:**  
-https://techstorelinux-production.up.railway.app/swagger/index.html  
+https://techstorelinux-production.up.railway.app/swagger/index.html
 
-👉 **API Online (Railway):**  
-https://bit.ly/4akQwIS  
+👉 API Online (Railway): <a href="https://bit.ly/4akQwIS">bit.ly/4akQwIS</a>
 
 👉 **Repositório (Linux / Produção):**  
-https://github.com/dmm76/techstore_linux  
+https://github.com/dmm76/techstore_linux
 
 👉 **Repositório (Windows / Desenvolvimento):**  
-https://github.com/dmm76/pucpr_volvo  
+https://github.com/dmm76/pucpr_volvo
 
 > Sem setup. Sem instalação. Apenas abra e teste.
 
@@ -47,14 +46,13 @@ Este projeto foi construído com decisões típicas de sistemas profissionais:
 ✔ Snapshot de dados sensíveis para preservar histórico  
 ✔ Separação clara entre camadas  
 ✔ Preparado para autenticação stateless  
-✔ Arquitetura pensada para crescimento  
+✔ Arquitetura pensada para crescimento
 
 > Mais do que funcionar — o sistema foi projetado para ser sustentável.
 
 ---
 
 ## 🏗️ Arquitetura (Visão Executiva)
-
 
 O TechStore segue uma separação clara de responsabilidades, priorizando manutenibilidade e previsibilidade do software.
 
@@ -73,23 +71,24 @@ O TechStore segue uma separação clara de responsabilidades, priorizando manute
 
 ## ⚙️ Stack Tecnológica
 
-- .NET  
-- ASP.NET Core  
-- Entity Framework Core  
-- SQL Server  
-- Swagger  
-- Railway  
+- .NET
+- ASP.NET Core
+- Entity Framework Core
+- SQL Server
+- Swagger
+- Railway
 
 ---
 
 ## 🚀 Capacidades do Sistema
 
 ### 🛍️ Produtos
+
 ✅ CRUD completo  
 ✅ Paginação  
 ✅ Filtros dinâmicos  
 ✅ Validações de domínio  
-✅ Tratamento de erros padronizado  
+✅ Tratamento de erros padronizado
 
 ---
 
@@ -99,14 +98,15 @@ O TechStore segue uma separação clara de responsabilidades, priorizando manute
 ✔ Snapshot de preço evita distorções futuras  
 ✔ Estoque validado antes da confirmação  
 ✔ Baixa automática impede venda fantasma  
-✔ Pedido vinculado ao usuário na finalização  
+✔ Pedido vinculado ao usuário na finalização
 
 > **Software crítico exige previsibilidade — não improviso.**
 
 ---
 
 ### 📊 Relatórios
-✅ Total vendido por categoria  
+
+✅ Total vendido por categoria
 
 Estrutura preparada para expansão futura.
 
@@ -117,7 +117,7 @@ Estrutura preparada para expansão futura.
 ✔ Autorização baseada em papéis (**Admin / User**)  
 ✔ Guards aplicados em endpoints críticos  
 ✔ Ownership garantindo isolamento de dados  
-✔ Middleware centralizado de exceções  
+✔ Middleware centralizado de exceções
 
 O uso atual de autenticação em memória é uma decisão consciente para simplificação acadêmica, mantendo o sistema preparado para evolução futura.
 
@@ -127,23 +127,23 @@ O uso atual de autenticação em memória é uma decisão consciente para simpli
 
 A documentação detalhada foi organizada em arquivos dedicados para manter o README objetivo e facilitar a navegação arquitetural do projeto.
 
-- 📐 [Arquitetura](ARCHITECTURE.md)  
-- 🧠 [Decisões Arquiteturais (ADR)](DECISIONS.md)  
-- 📊 [Project Overview](PROJECT_OVERVIEW.md)  
-- ⚠️ [Dívidas Técnicas](TECH_DEBT_PT.md)  
+- 📐 [Arquitetura](ARCHITECTURE.md)
+- 🧠 [Decisões Arquiteturais (ADR)](DECISIONS.md)
+- 📊 [Project Overview](PROJECT_OVERVIEW.md)
+- ⚠️ [Dívidas Técnicas](TECH_DEBT_PT.md)
 - 🔐 [Dívidas de Segurança](TECH_DEBT_SECURITY.md)
 
 ---
 
 ## 🎯 Próxima Evolução
 
-- Autenticação com JWT  
-- Refresh Tokens  
-- Observabilidade  
-- Logs estruturados  
-- Testes automatizados  
-- Cache  
-- Rate limiting  
+- Autenticação com JWT
+- Refresh Tokens
+- Observabilidade
+- Logs estruturados
+- Testes automatizados
+- Cache
+- Rate limiting
 
 > Evoluir sem comprometer a estabilidade é o objetivo.
 
@@ -152,15 +152,15 @@ A documentação detalhada foi organizada em arquivos dedicados para manter o RE
 ## 👨‍💻 Autor
 
 **Douglas Marcelo Monquero**  
-Engenharia de Software — UniCesumar  
+Engenharia de Software — UniCesumar
 
 ---
 
 ## 💡 Filosofia
 
 > **“Você não precisa começar perfeito.  
-Só precisa evitar erros perigosos:  
-estado público, regra espalhada, dependência acoplada e modelos anêmicos.”**
+> Só precisa evitar erros perigosos:  
+> estado público, regra espalhada, dependência acoplada e modelos anêmicos.”**
 
 > Arquitetura não elimina complexidade —  
 > ela impede que a complexidade vire caos.
