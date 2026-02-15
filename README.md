@@ -15,7 +15,18 @@ Backend arquitetado para um e-commerce moderno com mentalidade de engenharia pro
 👉 **Swagger:**  
 https://techstorelinux-production.up.railway.app/swagger/index.html
 
-👉 API Online (Railway): <a href="https://bit.ly/4akQwIS">bit.ly/4akQwIS</a>
+## 🌐 API Online (Railway)
+
+<p align="center">
+  <a href="https://bit.ly/4akQwIS">
+    <img src="utils/images/qrcode.png" alt="QR Code TechStore API" width="180"/>
+  </a>
+</p>
+
+<p align="center">
+  👉 <strong>Acesse a API:</strong><br>
+  <a href="https://bit.ly/4akQwIS">bit.ly/4akQwIS</a>
+</p>
 
 👉 **Repositório (Linux / Produção):**  
 https://github.com/dmm76/techstore_linux
